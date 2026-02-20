@@ -21,7 +21,8 @@ const RoomContent = () => {
     const [difficulty, setDifficulty] = useState<'Easy' | 'Medium' | 'Hard' | 'Expert' | 'Master'>('Medium');
 
     const myId = (session?.user as any)?.id;
-    const currentIsHost = players.find(p => p.id === myId)?.isHost || false;
+    const myName = session?.user?.name;
+    const currentIsHost = players.find(p => (p.id && p.id === myId) || (p.name && p.name === myName))?.isHost || false;
 
     useEffect(() => {
         if (!session) return;
