@@ -10,6 +10,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@line/liff": "^2.27.3",
     "next": "16.1.6",
     "next-auth": "^4.24.13",
     "react": "19.2.3",
