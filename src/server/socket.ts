@@ -32,24 +32,39 @@ const DIFFICULTY_MAP = {
 
 io.on("connection", (socket) => {
     socket.on("join_room", (data: { roomId: string, name: string, userId: string }) => {
-        const { roomId, name } = data;
+        const { roomId, name, userId } = data;
 
         if (!rooms[roomId]) {
             rooms[roomId] = { id: roomId, players: [], state: null, difficulty: 'Medium' };
         }
 
         const room = rooms[roomId];
-        if (room.players.length >= 4) {
-            socket.emit("error", "房間已滿");
-            return;
+
+        // 檢查是否為重複加入 (Handle reconnection)
+        const existingPlayerIndex = room.players.findIndex(p => p.id === userId);
+
+        if (existingPlayerIndex !== -1) {
+            // 更新舊玩家的連線資訊，不改變位置與房主身分
+            const oldSocketId = room.players[existingPlayerIndex].socketId;
+            delete playerRoomMap[oldSocketId];
+
+            room.players[existingPlayerIndex].socketId = socket.id;
+            room.players[existingPlayerIndex].name = name; // 可能改名
+            playerRoomMap[socket.id] = roomId;
+            console.log(`[Room] Player ${name} re-joined room ${roomId} (Maintains position ${existingPlayerIndex})`);
+        } else {
+            // 新玩家加入
+            if (room.players.length >= 4) {
+                socket.emit("error", "房間已滿");
+                return;
+            }
+            const isHost = room.players.length === 0;
+            room.players.push({ id: userId, name, socketId: socket.id, isHost });
+            playerRoomMap[socket.id] = roomId;
+            console.log(`[Room] Player ${name} joined room ${roomId} (Host: ${isHost})`);
         }
 
-        const isHost = room.players.length === 0;
-        room.players.push({ id: data.userId, name, socketId: socket.id, isHost });
-        playerRoomMap[socket.id] = roomId;
         socket.join(roomId);
-
-        console.log(`Player ${name} joined room ${roomId} (Host: ${isHost})`);
 
         io.to(roomId).emit("room_update", {
             players: room.players.map(p => ({ id: p.id, name: p.name, isHost: p.isHost, ready: true })),
