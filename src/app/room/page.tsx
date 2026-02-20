@@ -1,17 +1,18 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useParams, useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useAppSession } from "../../hooks/useAppSession";
 import { io, Socket } from "socket.io-client";
-import GameBoard from "@/components/GameBoard"; // We will need to update GameBoard to accept socket/state
+import GameBoard from "@/components/GameBoard";
 import { GameState } from "@/logic/types";
 
 let socket: Socket;
 
-const RoomPage = () => {
-    const { data: session } = useSession();
-    const { id: roomId } = useParams();
+const RoomContent = () => {
+    const { session } = useAppSession();
+    const searchParams = useSearchParams();
+    const roomId = searchParams.get("id");
     const router = useRouter();
 
     const [players, setPlayers] = useState<{ name: string, isHost: boolean, ready: boolean }[]>([]);
@@ -172,6 +173,14 @@ const RoomPage = () => {
                 </p>
             </div>
         </div>
+    );
+};
+
+const RoomPage = () => {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black/50" />}>
+            <RoomContent />
+        </Suspense>
     );
 };
 

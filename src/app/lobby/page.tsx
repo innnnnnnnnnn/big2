@@ -1,11 +1,11 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useAppSession } from "../../hooks/useAppSession";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const LobbyPage = () => {
-    const { data: session, status } = useSession();
+    const { session, status, logout } = useAppSession();
     const router = useRouter();
     const [roomId, setRoomId] = useState("");
 
@@ -17,13 +17,13 @@ const LobbyPage = () => {
 
     const createRoom = () => {
         const id = Math.random().toString(36).substring(2, 8).toUpperCase();
-        router.push(`/room/${id}`);
+        router.push(`/room?id=${id}`);
     };
 
     const joinRoom = (e: React.FormEvent) => {
         e.preventDefault();
         if (roomId.trim()) {
-            router.push(`/room/${roomId.toUpperCase()}`);
+            router.push(`/room?id=${roomId.toUpperCase()}`);
         }
     };
 
@@ -36,7 +36,7 @@ const LobbyPage = () => {
                         <div className="text-white font-bold">{session.user?.name}</div>
                         <div className="text-yellow-400 font-black">💰 1,000</div>
                     </div>
-                    <button onClick={() => signOut()} className="text-white/50 hover:text-white text-sm">Sign Out</button>
+                    <button onClick={() => logout()} className="text-white/50 hover:text-white text-sm">Sign Out</button>
                 </div>
             </div>
 

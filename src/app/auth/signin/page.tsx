@@ -1,15 +1,19 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { useAppSession } from "../../../hooks/useAppSession";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const SignInPage = () => {
     const [guestName, setGuestName] = useState("");
+    const { login } = useAppSession();
+    const router = useRouter();
 
     const handleGuestLogin = (e: React.FormEvent) => {
         e.preventDefault();
         if (guestName.trim()) {
-            signIn("guest", { name: guestName, callbackUrl: "/lobby" });
+            login(guestName);
+            router.push("/lobby");
         }
     };
 
@@ -41,35 +45,6 @@ const SignInPage = () => {
                         </div>
                     </form>
 
-                    <button
-                        onClick={() => {
-                            console.log("Signing in with google...");
-                            signIn("google", { callbackUrl: "/lobby" });
-                        }}
-                        className="w-full py-4 bg-white hover:bg-gray-100 text-black font-bold rounded-xl flex items-center justify-center space-x-3 transition-all active:scale-95"
-                    >
-                        <span>使用 Google 帳號登入</span>
-                    </button>
-
-                    <button
-                        onClick={() => {
-                            console.log("Signing in with apple...");
-                            signIn("apple", { callbackUrl: "/lobby" });
-                        }}
-                        className="w-full py-4 bg-[#222] hover:bg-[#333] text-white font-bold rounded-xl flex items-center justify-center space-x-3 transition-all active:scale-95"
-                    >
-                        <span>使用 Apple 帳號登入</span>
-                    </button>
-
-                    <button
-                        onClick={() => {
-                            console.log("Signing in with line...");
-                            signIn("line", { callbackUrl: "/lobby" });
-                        }}
-                        className="w-full py-4 bg-[#06C755] hover:bg-[#05b14c] text-white font-bold rounded-xl flex items-center justify-center space-x-3 transition-all active:scale-95"
-                    >
-                        <span>使用 LINE 帳號登入</span>
-                    </button>
                 </div>
 
                 <div className="mt-12 text-center text-white/30 text-sm">
