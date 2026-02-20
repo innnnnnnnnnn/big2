@@ -9,12 +9,13 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log("[Home] Auth Status:", status);
     if (status === "unauthenticated") {
-      router.push("/auth/signin");
+      window.location.href = "/big2/auth/signin/";
     } else if (status === "authenticated") {
-      router.push("/lobby");
+      window.location.href = "/big2/lobby/";
     }
-  }, [status, router]);
+  }, [status]);
 
   return (
     <main className="min-h-screen bg-black flex items-center justify-center">

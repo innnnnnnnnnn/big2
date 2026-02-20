@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import liff from "@line/liff";
 
 export interface AppUser {
     id: string;
@@ -10,22 +11,55 @@ export interface AppUser {
 export const useAppSession = () => {
     const [user, setUser] = useState<AppUser | null>(null);
     const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
+    const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
 
     useEffect(() => {
-        const stored = localStorage.getItem("big2_user");
-        if (stored) {
-            try {
-                setUser(JSON.parse(stored));
-                setStatus("authenticated");
-            } catch (e) {
+        const initSession = async () => {
+            console.log("[AppSession] Initializing...");
+
+            // 1. Check LocalStorage first for high speed
+            const stored = localStorage.getItem("big2_user");
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    setUser(parsed);
+                    setStatus("authenticated");
+                    console.log("[AppSession] Authenticated via LocalStorage:", parsed.name);
+                } catch (e) {
+                    console.error("[AppSession] LocalStorage parse error");
+                }
+            }
+
+            // 2. Check LIFF if ID exists
+            if (liffId) {
+                try {
+                    console.log("[AppSession] Initializing LIFF:", liffId);
+                    await liff.init({ liffId });
+                    if (liff.isLoggedIn()) {
+                        const profile = await liff.getProfile();
+                        console.log("[AppSession] LIFF Profile found:", profile.displayName);
+
+                        const newUser = { id: `line_${profile.userId}`, name: profile.displayName };
+                        localStorage.setItem("big2_user", JSON.stringify(newUser));
+                        setUser(newUser);
+                        setStatus("authenticated");
+                    } else if (!stored) {
+                        setStatus("unauthenticated");
+                    }
+                } catch (err) {
+                    console.error("[AppSession] LIFF Init Error:", err);
+                    if (!stored) setStatus("unauthenticated");
+                }
+            } else if (!stored) {
                 setStatus("unauthenticated");
             }
-        } else {
-            setStatus("unauthenticated");
-        }
-    }, []);
+        };
+
+        initSession();
+    }, [liffId]);
 
     const login = (name: string) => {
+        console.log("[AppSession] Logging in user:", name);
         const newUser = { id: `user_${Math.random().toString(36).substr(2, 9)}`, name };
         localStorage.setItem("big2_user", JSON.stringify(newUser));
         setUser(newUser);
@@ -33,10 +67,15 @@ export const useAppSession = () => {
     };
 
     const logout = () => {
+        console.log("[AppSession] Logging out...");
         localStorage.removeItem("big2_user");
+        if (liffId && liff.isLoggedIn()) {
+            liff.logout();
+        }
         setUser(null);
-        setStatus("authenticated"); // Re-trigger effect or just set unauthenticated
-        window.location.href = "/big2/auth/signin"; // Force redirect
+        setStatus("unauthenticated");
+        // Force redirect to signin
+        window.location.href = (process.env.NEXT_PUBLIC_BASE_PATH || "/big2") + "/auth/signin/";
     };
 
     return { session: user ? { user } : null, status, login, logout };

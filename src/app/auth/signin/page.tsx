@@ -7,23 +7,29 @@ import liff from "@line/liff";
 
 const SignInPage = () => {
     const [guestName, setGuestName] = useState("");
-    const { login } = useAppSession();
+    const { session, status, login } = useAppSession();
     const router = useRouter();
     const [liffError, setLiffError] = useState<string | null>(null);
 
     const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
 
+    // 如果已經登入，自動跳轉到大廳
+    useEffect(() => {
+        if (status === "authenticated") {
+            window.location.href = "/big2/lobby/";
+        }
+    }, [status]);
+
     const handleGuestLogin = (e: React.FormEvent) => {
         e.preventDefault();
         if (guestName.trim()) {
             login(guestName);
-            router.push("/lobby");
         }
     };
 
     const handleLineLogin = async () => {
         if (!liffId) {
-            setLiffError("尚未設定 NEXT_PUBLIC_LIFF_ID，請參考說明文件。");
+            setLiffError("尚未設定 NEXT_PUBLIC_LIFF_ID。");
             return;
         }
 
@@ -34,33 +40,11 @@ const SignInPage = () => {
             } else {
                 const profile = await liff.getProfile();
                 login(profile.displayName);
-                // 使用 window.location 進行強制跳轉，確保靜態導向成功
-                window.location.href = "/big2/lobby/";
             }
         } catch (err: any) {
-            console.error("LIFF Init Error", err);
-            setLiffError("LINE 登入初始化失敗: " + err.message);
+            setLiffError("LINE 登入失敗: " + err.message);
         }
     };
-
-    useEffect(() => {
-        if (liffId) {
-            liff.init({ liffId }).then(() => {
-                if (liff.isLoggedIn()) {
-                    liff.getProfile().then(profile => {
-                        console.log("LIFF Profile detected:", profile.displayName);
-                        login(profile.displayName);
-                        // 如果已經在登入頁且已有資料，自動跳轉
-                        setTimeout(() => {
-                            window.location.href = "/big2/lobby/";
-                        }, 500);
-                    });
-                }
-            }).catch(err => {
-                console.error("LIFF Background Init Error", err);
-            });
-        }
-    }, [liffId]);
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4">
@@ -111,6 +95,13 @@ const SignInPage = () => {
 
                 <div className="mt-12 text-center text-white/30 text-sm">
                     登入即表示您同意服務條款。
+                </div>
+
+                {/* Debug Footer (Only visible during setup/dev) */}
+                <div className="mt-8 pt-4 border-t border-white/5 opacity-10 hover:opacity-100 transition-opacity">
+                    <p className="text-[10px] text-white/40 text-center font-mono">
+                        DEBUG: ST={status} | ID={liffId ? `${liffId.substring(0, 6)}...` : "NONE"}
+                    </p>
                 </div>
             </div>
         </div>
