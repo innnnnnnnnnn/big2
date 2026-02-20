@@ -21,8 +21,17 @@ const RoomContent = () => {
     const [difficulty, setDifficulty] = useState<'Easy' | 'Medium' | 'Hard' | 'Expert' | 'Master'>('Medium');
 
     const myId = (session?.user as any)?.id;
-    const myName = session?.user?.name;
-    const currentIsHost = players.find(p => (p.id && p.id === myId) || (p.name && p.name === myName))?.isHost || false;
+    const myName = (session?.user?.name || "").trim();
+    const meMatched = players.find(p => {
+        const pId = p.id;
+        const pName = (p.name || "").trim();
+        return (pId && pId === myId) || (pName && pName === myName);
+    });
+    const currentIsHost = meMatched?.isHost || false;
+
+    useEffect(() => {
+        console.log("[Room] Auth Debug:", { myId, myName, playersCount: players.length, amIHost: currentIsHost });
+    }, [myId, myName, players, currentIsHost]);
 
     useEffect(() => {
         if (!session) return;

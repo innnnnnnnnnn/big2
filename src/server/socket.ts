@@ -92,6 +92,13 @@ io.on("connection", (socket) => {
             }
         }
 
+        // Broadcast room update so everyone sees AI players join
+        io.to(data.roomId).emit("room_update", {
+            players: room.players.map(p => ({ id: p.id, name: p.name, isHost: p.isHost, ready: true, isAI: p.isAI })),
+            count: room.players.length,
+            difficulty: room.difficulty
+        });
+
         const playerInfos = room.players.map((p, i) => ({
             name: p.name,
             isHuman: !p.isAI,
