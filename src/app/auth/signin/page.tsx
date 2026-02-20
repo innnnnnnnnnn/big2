@@ -34,7 +34,7 @@ const SignInPage = () => {
                                 placeholder="輸入暱稱..."
                                 value={guestName}
                                 onChange={(e) => setGuestName(e.target.value)}
-                                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 text-white focus:border-yellow-500 outline-none"
+                                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-yellow-500 outline-none"
                             />
                             <button
                                 type="submit"
@@ -45,6 +45,29 @@ const SignInPage = () => {
                         </div>
                     </form>
 
+                    <div className="text-white/40 text-xs text-center mb-2">或使用社群帳號 (快速體驗)</div>
+
+                    <button
+                        onClick={() => {
+                            login("LINE 玩家");
+                            router.push("/lobby");
+                        }}
+                        className="w-full py-4 bg-[#06C755] hover:bg-[#05b14c] text-white font-bold rounded-xl flex items-center justify-center space-x-3 transition-all active:scale-95 shadow-lg shadow-green-900/20"
+                    >
+                        <span className="text-xl">💬</span>
+                        <span>使用 LINE 帳號登入</span>
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            login("Google 玩家");
+                            router.push("/lobby");
+                        }}
+                        className="w-full py-4 bg-white hover:bg-gray-100 text-black font-bold rounded-xl flex items-center justify-center space-x-3 transition-all active:scale-95"
+                    >
+                        <span className="text-xl">🔍</span>
+                        <span>使用 Google 帳號登入</span>
+                    </button>
                 </div>
 
                 <div className="mt-12 text-center text-white/30 text-sm">
