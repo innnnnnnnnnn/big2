@@ -34,7 +34,8 @@ const SignInPage = () => {
             } else {
                 const profile = await liff.getProfile();
                 login(profile.displayName);
-                router.push("/lobby");
+                // 使用 window.location 進行強制跳轉，確保靜態導向成功
+                window.location.href = "/big2/lobby/";
             }
         } catch (err: any) {
             console.error("LIFF Init Error", err);
@@ -47,8 +48,12 @@ const SignInPage = () => {
             liff.init({ liffId }).then(() => {
                 if (liff.isLoggedIn()) {
                     liff.getProfile().then(profile => {
+                        console.log("LIFF Profile detected:", profile.displayName);
                         login(profile.displayName);
-                        router.push("/lobby");
+                        // 如果已經在登入頁且已有資料，自動跳轉
+                        setTimeout(() => {
+                            window.location.href = "/big2/lobby/";
+                        }, 500);
                     });
                 }
             }).catch(err => {
