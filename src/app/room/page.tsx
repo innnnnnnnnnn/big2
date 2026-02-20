@@ -36,8 +36,13 @@ const RoomContent = () => {
         socket.on("room_update", (data) => {
             setPlayers(data.players);
             if (data.difficulty) setDifficulty(data.difficulty);
-            const me = data.players.find((p: any) => p.name === session.user?.name);
-            if (me) setIsHost(me.isHost);
+
+            const myId = (session?.user as any)?.id;
+            const me = data.players.find((p: any) => p.id === myId);
+            if (me) {
+                console.log("[Room] My status updated:", me);
+                setIsHost(me.isHost);
+            }
         });
 
         socket.on("difficulty_update", (newDiff: any) => {

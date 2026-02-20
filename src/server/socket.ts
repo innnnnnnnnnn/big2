@@ -52,7 +52,7 @@ io.on("connection", (socket) => {
         console.log(`Player ${name} joined room ${roomId} (Host: ${isHost})`);
 
         io.to(roomId).emit("room_update", {
-            players: room.players.map(p => ({ name: p.name, isHost: p.isHost, ready: true })),
+            players: room.players.map(p => ({ id: p.id, name: p.name, isHost: p.isHost, ready: true })),
             count: room.players.length,
             difficulty: room.difficulty
         });
