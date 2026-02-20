@@ -15,11 +15,13 @@ const RoomContent = () => {
     const roomId = searchParams.get("id");
     const router = useRouter();
 
-    const [players, setPlayers] = useState<{ name: string, isHost: boolean, ready: boolean }[]>([]);
+    const [players, setPlayers] = useState<{ id?: string, name: string, isHost: boolean, ready: boolean }[]>([]);
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [playerIndex, setPlayerIndex] = useState<number>(-1);
-    const [isHost, setIsHost] = useState(false);
     const [difficulty, setDifficulty] = useState<'Easy' | 'Medium' | 'Hard' | 'Expert' | 'Master'>('Medium');
+
+    const myId = (session?.user as any)?.id;
+    const currentIsHost = players.find(p => p.id === myId)?.isHost || false;
 
     useEffect(() => {
         if (!session) return;
@@ -36,13 +38,7 @@ const RoomContent = () => {
         socket.on("room_update", (data) => {
             setPlayers(data.players);
             if (data.difficulty) setDifficulty(data.difficulty);
-
-            const myId = (session?.user as any)?.id;
-            const me = data.players.find((p: any) => p.id === myId);
-            if (me) {
-                console.log("[Room] My status updated:", me);
-                setIsHost(me.isHost);
-            }
+            console.log("[Room] Updated players list. My ID:", myId);
         });
 
         socket.on("difficulty_update", (newDiff: any) => {
@@ -96,7 +92,7 @@ const RoomContent = () => {
                 roomId={roomId as string}
                 onExit={() => router.push("/lobby")}
                 onNextGame={startGame}
-                isHost={isHost}
+                isHost={currentIsHost}
             />
         );
     }
@@ -143,18 +139,18 @@ const RoomContent = () => {
                 <div className="mb-10 bg-black/20 p-6 rounded-2xl border border-white/5">
                     <h2 className="text-white font-bold mb-4 flex items-center">
                         🤖 電腦難度設定
-                        {!isHost && <span className="ml-2 text-xs text-white/40 font-normal">(由房主設定)</span>}
+                        {!currentIsHost && <span className="ml-2 text-xs text-white/40 font-normal">(由房主設定)</span>}
                     </h2>
                     <div className="flex flex-wrap gap-2">
                         {difficulties.map((diff) => (
                             <button
                                 key={diff.id}
-                                disabled={!isHost}
+                                disabled={!currentIsHost}
                                 onClick={() => handleDifficultyChange(diff.id as any)}
                                 className={`flex-1 min-w-[80px] py-3 rounded-xl font-black text-sm transition-all border-2 ${difficulty === diff.id
                                     ? `${diff.color} border-white text-white shadow-[0_0_15px_rgba(255,255,255,0.3)]`
                                     : 'bg-black/40 border-transparent text-white/40 hover:bg-black/60'
-                                    } ${!isHost && 'cursor-default opacity-80'}`}
+                                    } ${!currentIsHost && 'cursor-default opacity-80'}`}
                             >
                                 {diff.name}
                             </button>
@@ -162,7 +158,7 @@ const RoomContent = () => {
                     </div>
                 </div>
 
-                {isHost ? (
+                {currentIsHost ? (
                     <button
                         onClick={startGame}
                         className="w-full py-5 bg-yellow-500 hover:bg-yellow-400 text-black font-black rounded-2xl text-xl shadow-[0_6px_0_rgb(180,100,0)] transition-all active:translate-y-1"
