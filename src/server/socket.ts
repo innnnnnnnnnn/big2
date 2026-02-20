@@ -66,8 +66,19 @@ io.on("connection", (socket) => {
 
         socket.join(roomId);
 
+        // 強制校正房主權限：確保第一個非 AI 玩家是 Host
+        let hostAssigned = false;
+        room.players.forEach((p) => {
+            if (!p.isAI && !hostAssigned) {
+                p.isHost = true;
+                hostAssigned = true;
+            } else {
+                p.isHost = false;
+            }
+        });
+
         io.to(roomId).emit("room_update", {
-            players: room.players.map(p => ({ id: p.id, name: p.name, isHost: p.isHost, ready: true })),
+            players: room.players.map(p => ({ id: p.id, name: p.name, isHost: p.isHost, ready: true, isAI: p.isAI })),
             count: room.players.length,
             difficulty: room.difficulty
         });
@@ -106,6 +117,17 @@ io.on("connection", (socket) => {
                 });
             }
         }
+
+        // 強制校正房主權限：AI 加入後確保第一個真人依舊是 Host
+        let hostAssigned = false;
+        room.players.forEach((p) => {
+            if (!p.isAI && !hostAssigned) {
+                p.isHost = true;
+                hostAssigned = true;
+            } else {
+                p.isHost = false;
+            }
+        });
 
         // Broadcast room update so everyone sees AI players join
         io.to(data.roomId).emit("room_update", {
