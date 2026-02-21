@@ -133,9 +133,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
     };
 
     return (
-        <div className="relative w-full min-h-screen bg-[#1a472a] overflow-y-auto md:overflow-hidden flex flex-col items-center py-20 px-4">
-            {/* Table Background Decoration */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] h-[300px] md:h-[500px] border-8 border-[#2e5d3e] rounded-full opacity-50 pointer-events-none" />
+        <div className="relative w-full min-h-screen bg-[#1a472a] flex flex-col items-center overflow-x-hidden">
+            {/* Background Decoration */}
+            <div className="fixed inset-0 pointer-events-none flex items-center justify-center opacity-30">
+                <div className="w-[800px] h-[500px] border-[12px] border-[#2e5d3e] rounded-full" />
+            </div>
 
             {/* EXIT Button (Top Left) */}
             <button
@@ -153,51 +155,115 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                 </span>
             </div>
 
-            {/* Opponents */}
-            {[2, 1, 3].map((pos, i) => {
-                const p = getPlayerAtPosition(pos);
-                const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
-                const layoutClasses = [
-                    "absolute top-4 md:top-8 left-1/2 -translate-x-1/2 flex-col items-center", // Top
-                    "absolute left-2 md:left-8 top-[40%] -translate-y-1/2 flex-col items-center md:rotate-90 origin-center scale-75 md:scale-100", // Left (Compact on mobile)
-                    "absolute right-2 md:right-8 top-[40%] -translate-y-1/2 flex-col items-center md:-rotate-90 origin-center scale-75 md:scale-100" // Right (Compact on mobile)
-                ][i];
-
-                return (
-                    <div key={pos} className={`${layoutClasses} text-white transition-all z-20 ${isCurrent ? 'opacity-100 scale-90 md:scale-110' : 'opacity-60 scale-75 md:scale-100'}`}>
-                        <div className="flex flex-col items-center mb-1 md:mb-2 text-center">
-                            <div className={`w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm md:text-xl mb-1 ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/40'}`}>
-                                👤
+            {/* Top Area: Opponent 2 (Opposite) */}
+            <div className="w-full pt-16 flex flex-col items-center z-20">
+                {(() => {
+                    const p = getPlayerAtPosition(2);
+                    const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
+                    return (
+                        <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-110' : 'opacity-80'}`}>
+                            <div className="relative mb-2">
+                                <div className={`w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center text-xl md:text-2xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.6)]' : 'bg-black/50'}`}>
+                                    👤
+                                </div>
+                                <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-6 h-6 md:w-8 md:h-8 rounded-full border-2 border-white flex items-center justify-center font-black text-xs md:text-sm">
+                                    {p.hand.length}
+                                </div>
                             </div>
-                            <div className="font-bold flex flex-col items-center text-[10px] md:text-base leading-tight">
-                                <span className="max-w-[60px] truncate">{p.name}</span>
-                                <span className="text-yellow-400 text-[8px] md:text-sm">💰 {p.score || 0}</span>
-                            </div>
+                            <div className="text-white font-bold text-sm md:text-base">{p.name}</div>
+                            <div className="text-yellow-400 text-xs font-bold">💰 {p.score.toLocaleString()}</div>
                         </div>
-                        <div className="flex -space-x-6 md:-space-x-8">
-                            {Array(p.hand.length).fill(0).map((_, cardIdx) => (
-                                <div key={cardIdx} className="w-6 h-8 md:w-10 md:h-14 bg-blue-800 border border-white/20 rounded-md shadow-sm" />
+                    );
+                })()}
+            </div>
+
+            {/* Middle Area: Table and Side Opponents */}
+            <div className="flex-1 w-full max-w-6xl relative flex items-center justify-center py-8 md:py-12">
+
+                {/* Left Opponent (Absolute) */}
+                <div className="absolute left-4 md:left-12 top-1/2 -translate-y-1/2 z-20 hidden sm:flex flex-col items-center">
+                    {(() => {
+                        const p = getPlayerAtPosition(1);
+                        const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
+                        return (
+                            <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-110' : 'opacity-70'}`}>
+                                <div className="relative mb-2">
+                                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg md:text-xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/50'}`}>
+                                        👤
+                                    </div>
+                                    <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-6 h-6 md:w-7 md:h-7 rounded-full border-2 border-white flex items-center justify-center font-black text-[10px] md:text-xs">
+                                        {p.hand.length}
+                                    </div>
+                                </div>
+                                <div className="text-white font-bold text-xs md:text-sm max-w-[80px] truncate">{p.name}</div>
+                            </div>
+                        );
+                    })()}
+                </div>
+
+                {/* Table Center (THEME) */}
+                <div className="relative z-10 bg-black/30 p-6 md:p-10 rounded-[40px] border border-white/10 flex flex-col items-center min-w-[300px] md:min-w-[480px] min-h-[160px] md:min-h-[240px] backdrop-blur-md shadow-2xl">
+                    <div className="text-white/20 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-4 border-b border-white/5 w-full text-center pb-2">Table Center</div>
+                    {gameState.tableHand ? (
+                        <div className="flex space-x-1 md:space-x-3 animate-in fade-in zoom-in duration-300 transform scale-75 md:scale-100">
+                            {gameState.tableHand.cards.map((c, i) => (
+                                <Card key={`${c.rank}-${c.suit}-${i}`} card={c} disabled />
                             ))}
                         </div>
-                    </div>
-                );
-            })}
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-full py-8 text-white/30">
+                            <div className="text-sm md:text-xl italic mb-3">等待玩家出牌...</div>
+                            <div className="w-16 h-1 bg-white/10 rounded-full" />
+                        </div>
+                    )}
 
-            {/* Table Center (Fixed Position to avoid overlapping) */}
-            <div className="relative z-10 bg-black/20 p-4 md:p-8 rounded-2xl border border-white/10 flex flex-col items-center min-w-[280px] md:min-w-[450px] min-h-[140px] md:min-h-[200px] backdrop-blur-sm mt-2 md:mt-[-50px] mb-8 md:mb-0">
-                <div className="text-white/20 text-[10px] md:text-xs font-bold uppercase tracking-wider mb-2 md:mb-4 border-b border-white/5 w-full text-center pb-1 md:pb-2">Table</div>
-                {gameState.tableHand ? (
-                    <div className="flex space-x-1 md:space-x-2 animate-in fade-in zoom-in duration-300 transform scale-[0.65] sm:scale-75 md:scale-100">
-                        {gameState.tableHand.cards.map((c, i) => (
-                            <Card key={`${c.rank}-${c.suit}-${i}`} card={c} disabled />
-                        ))}
+                    {/* Side Opponents Display on Mobile (Numeric only) */}
+                    <div className="absolute -left-16 sm:hidden flex flex-col space-y-4">
+                        {(() => {
+                            const p = getPlayerAtPosition(1);
+                            const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
+                            return (
+                                <div className={`flex items-center space-x-2 bg-black/40 p-1.5 rounded-full border ${isCurrent ? 'border-yellow-500' : 'border-white/10'}`}>
+                                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{p.hand.length}</div>
+                                    <span className="text-white text-[10px] pr-2 font-bold max-w-[40px] truncate">{p.name}</span>
+                                </div>
+                            );
+                        })()}
                     </div>
-                ) : (
-                    <div className="flex flex-col items-center justify-center h-full py-6 md:py-10">
-                        <div className="text-white/30 italic text-sm md:text-lg mb-2">等待出牌...</div>
-                        <div className="w-10 h-1 bg-white/5 rounded-full" />
+                    <div className="absolute -right-16 sm:hidden flex flex-col space-y-4">
+                        {(() => {
+                            const p = getPlayerAtPosition(3);
+                            const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
+                            return (
+                                <div className={`flex items-center space-x-2 bg-black/40 p-1.5 rounded-full border ${isCurrent ? 'border-yellow-500' : 'border-white/10'} flex-row-reverse`}>
+                                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{p.hand.length}</div>
+                                    <span className="text-white text-[10px] pl-2 font-bold max-w-[40px] truncate text-right">{p.name}</span>
+                                </div>
+                            );
+                        })()}
                     </div>
-                )}
+                </div>
+
+                {/* Right Opponent (Absolute) */}
+                <div className="absolute right-4 md:right-12 top-1/2 -translate-y-1/2 z-20 hidden sm:flex flex-col items-center">
+                    {(() => {
+                        const p = getPlayerAtPosition(3);
+                        const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
+                        return (
+                            <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-110' : 'opacity-70'}`}>
+                                <div className="relative mb-2">
+                                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg md:text-xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/50'}`}>
+                                        👤
+                                    </div>
+                                    <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-6 h-6 md:w-7 md:h-7 rounded-full border-2 border-white flex items-center justify-center font-black text-[10px] md:text-xs">
+                                        {p.hand.length}
+                                    </div>
+                                </div>
+                                <div className="text-white font-bold text-xs md:text-sm max-w-[80px] truncate">{p.name}</div>
+                            </div>
+                        );
+                    })()}
+                </div>
             </div>
 
             {/* Error Message */}
@@ -207,101 +273,103 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                 </div>
             )}
 
-            {/* Bottom Player Area (Consolidated Controls & Hand) */}
-            <div className="relative bottom-4 mt-auto flex flex-col items-center max-w-full w-full z-40">
+            {/* Bottom Controls Area */}
+            <div className="w-full bg-black/20 backdrop-blur-lg border-t border-white/5 py-6 md:py-10 px-4 z-40">
+                <div className="max-w-4xl mx-auto flex flex-col items-center">
 
-                {/* 1. Integrated Info & Organize Bar (Above Hand) */}
-                <div className="w-full max-w-4xl px-2 md:px-4 flex flex-col items-center space-y-2 md:space-y-4 mb-4 md:mb-8">
-                    {/* Button Rows */}
-                    <div className="flex flex-wrap justify-center gap-2 md:gap-4">
-                        {/* Group A: Organize Buttons */}
-                        <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 shadow-inner">
-                            <button
-                                onClick={handleGroupCards}
-                                disabled={selectedCards.length === 0}
-                                className="px-3 md:px-6 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-800 text-white rounded-lg text-xs md:text-sm font-black transition-all active:scale-95"
-                            >
-                                🧩 組合
-                            </button>
-                            <button
-                                onClick={handleSmartSort}
-                                className="px-3 md:px-6 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg text-xs md:text-sm font-black transition-all ml-2"
-                            >
-                                🪄 智能
-                            </button>
-                        </div>
-
-                        {/* Group B: Quick Hand Helpers (Always Visible) */}
-                        <div className="flex bg-white/5 backdrop-blur-sm p-1 rounded-xl border border-white/10 overflow-x-auto max-w-full scrollbar-hide">
-                            {[
-                                { type: HandType.Pair, label: '👥 對子', key: 'Pair', color: 'bg-orange-600' },
-                                { type: HandType.Straight, label: '📏 順子', key: 'Straight', color: 'bg-green-600' },
-                                { type: HandType.FullHouse, label: '🏠 葫蘆', key: 'FullHouse', color: 'bg-blue-600' },
-                                { type: HandType.FourOfAKind, label: '💣 鐵支', key: 'FourOfAKind', color: 'bg-red-600' }
-                            ].map((item) => (
+                    {/* 1. Integrated Info & Organize Bar (Above Hand) */}
+                    <div className="w-full max-w-4xl px-2 md:px-4 flex flex-col items-center space-y-2 md:space-y-4 mb-4 md:mb-8">
+                        {/* Button Rows */}
+                        <div className="flex flex-wrap justify-center gap-2 md:gap-4">
+                            {/* Group A: Organize Buttons */}
+                            <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 shadow-inner">
                                 <button
-                                    key={item.key}
-                                    onClick={() => handleAutoPlayCombo(item.type)}
-                                    disabled={!(availableCombos as any)[item.key]}
-                                    className={`px-3 md:px-5 py-2 rounded-lg font-bold text-[10px] md:text-xs transition-all ml-1.5 first:ml-0 whitespace-nowrap ${(availableCombos as any)[item.key]
-                                        ? `${item.color} text-white shadow-lg animate-pulse`
-                                        : 'bg-black/40 text-white/20'
-                                        }`}
+                                    onClick={handleGroupCards}
+                                    disabled={selectedCards.length === 0}
+                                    className="px-3 md:px-6 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-800 text-white rounded-lg text-xs md:text-sm font-black transition-all active:scale-95"
                                 >
-                                    {item.label}
+                                    🧩 組合
                                 </button>
-                            ))}
+                                <button
+                                    onClick={handleSmartSort}
+                                    className="px-3 md:px-6 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg text-xs md:text-sm font-black transition-all ml-2"
+                                >
+                                    🪄 智能
+                                </button>
+                            </div>
+
+                            {/* Group B: Quick Hand Helpers (Always Visible) */}
+                            <div className="flex bg-white/5 backdrop-blur-sm p-1 rounded-xl border border-white/10 overflow-x-auto max-w-full scrollbar-hide">
+                                {[
+                                    { type: HandType.Pair, label: '👥 對子', key: 'Pair', color: 'bg-orange-600' },
+                                    { type: HandType.Straight, label: '📏 順子', key: 'Straight', color: 'bg-green-600' },
+                                    { type: HandType.FullHouse, label: '🏠 葫蘆', key: 'FullHouse', color: 'bg-blue-600' },
+                                    { type: HandType.FourOfAKind, label: '💣 鐵支', key: 'FourOfAKind', color: 'bg-red-600' }
+                                ].map((item) => (
+                                    <button
+                                        key={item.key}
+                                        onClick={() => handleAutoPlayCombo(item.type)}
+                                        disabled={!(availableCombos as any)[item.key]}
+                                        className={`px-3 md:px-5 py-2 rounded-lg font-bold text-[10px] md:text-xs transition-all ml-1.5 first:ml-0 whitespace-nowrap ${(availableCombos as any)[item.key]
+                                            ? `${item.color} text-white shadow-lg animate-pulse`
+                                            : 'bg-black/40 text-white/20'
+                                            }`}
+                                    >
+                                        {item.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* 2. Action Controls (Play/Pass) */}
-                <div className="flex space-x-4 mb-4">
-                    <button
-                        onClick={() => handlePlay()}
-                        disabled={!isMyTurn || selectedCards.length === 0}
-                        className="px-8 py-2 bg-white hover:bg-gray-100 disabled:bg-gray-800 disabled:text-white/20 text-black font-black rounded-lg shadow-[0_4px_0_rgb(200,200,200)] disabled:shadow-none transition-all active:translate-y-1 text-base"
-                    >
-                        出牌
-                    </button>
-                    <button
-                        onClick={handlePass}
-                        disabled={!isMyTurn || gameState.tableHand === null}
-                        className="px-8 py-2 bg-red-600 hover:bg-red-500 disabled:bg-gray-800 disabled:text-white/20 text-white font-black rounded-lg shadow-[0_4px_0_rgb(150,0,0)] disabled:shadow-none transition-all active:translate-y-1 text-base"
-                    >
-                        PASS
-                    </button>
-                </div>
+                    {/* 2. Action Controls (Play/Pass) */}
+                    <div className="flex space-x-4 mb-4">
+                        <button
+                            onClick={() => handlePlay()}
+                            disabled={!isMyTurn || selectedCards.length === 0}
+                            className="px-8 py-2 bg-white hover:bg-gray-100 disabled:bg-gray-800 disabled:text-white/20 text-black font-black rounded-lg shadow-[0_4px_0_rgb(200,200,200)] disabled:shadow-none transition-all active:translate-y-1 text-base"
+                        >
+                            出牌
+                        </button>
+                        <button
+                            onClick={handlePass}
+                            disabled={!isMyTurn || gameState.tableHand === null}
+                            className="px-8 py-2 bg-red-600 hover:bg-red-500 disabled:bg-gray-800 disabled:text-white/20 text-white font-black rounded-lg shadow-[0_4px_0_rgb(150,0,0)] disabled:shadow-none transition-all active:translate-y-1 text-base"
+                        >
+                            PASS
+                        </button>
+                    </div>
 
-                {/* 3. Player Hand */}
+                    {/* 3. Player Hand */}
 
-                {/* Hand Display */}
-                <div className="flex -space-x-8 md:-space-x-4 hover:-space-x-2 transition-all pb-8 overflow-x-auto max-w-full px-6 md:px-10 scrollbar-hide transform scale-90 md:scale-100">
-                    {localHand.map((card, i) => {
-                        // Logic to add extra spacing for groups
-                        const isBoundary = i > 0 &&
-                            // In Smart Sort mode, we might want to visual distance between pairs/5-card hands
-                            // For simplicity, just add some margin if the current and previous card ranks are different
-                            // ONLY during "Smart Sort" feel
-                            false; // We'll skip complex spacing for now to avoid layout issues
+                    {/* Hand Display */}
+                    <div className="flex -space-x-8 md:-space-x-4 hover:-space-x-2 transition-all pb-8 overflow-x-auto max-w-full px-6 md:px-10 scrollbar-hide transform scale-90 md:scale-100">
+                        {localHand.map((card, i) => {
+                            // Logic to add extra spacing for groups
+                            const isBoundary = i > 0 &&
+                                // In Smart Sort mode, we might want to visual distance between pairs/5-card hands
+                                // For simplicity, just add some margin if the current and previous card ranks are different
+                                // ONLY during "Smart Sort" feel
+                                false; // We'll skip complex spacing for now to avoid layout issues
 
-                        return (
-                            <div key={`${card.rank}-${card.suit}`} className="flex">
-                                <Card
-                                    card={card}
-                                    selected={selectedCards.some(c => c.rank === card.rank && c.suit === card.suit)}
-                                    onClick={() => toggleCardSelection(card)}
-                                    disabled={false}
-                                />
-                            </div>
-                        );
-                    })}
+                            return (
+                                <div key={`${card.rank}-${card.suit}`} className="flex">
+                                    <Card
+                                        card={card}
+                                        selected={selectedCards.some(c => c.rank === card.rank && c.suit === card.suit)}
+                                        onClick={() => toggleCardSelection(card)}
+                                        disabled={false}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
             {/* Finish Screen */}
             {gameState.isFinished && (
-                <div className="absolute inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-10 text-white">
+                <div className="absolute inset-0 bg-black/80 z-[100] flex flex-col items-center justify-center p-10 text-white">
                     <div className="text-3xl text-yellow-500 mb-8 font-black animate-bounce">
                         🏆 恭喜 {gameState.players.find(p => p.hand.length === 0)?.name} 獲勝！
                     </div>
