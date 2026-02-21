@@ -133,16 +133,16 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
     };
 
     return (
-        <div className="relative w-full h-screen bg-[#1a472a] overflow-hidden flex flex-col items-center justify-center p-4">
+        <div className="relative w-full min-h-screen bg-[#1a472a] overflow-y-auto md:overflow-hidden flex flex-col items-center py-20 px-4">
             {/* Table Background Decoration */}
-            <div className="absolute w-[800px] h-[500px] border-8 border-[#2e5d3e] rounded-full opacity-50 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[800px] h-[300px] md:h-[500px] border-8 border-[#2e5d3e] rounded-full opacity-50 pointer-events-none" />
 
             {/* EXIT Button (Top Left) */}
             <button
                 onClick={onExit}
-                className="absolute top-4 left-4 z-20 px-4 py-2 bg-red-600/50 hover:bg-red-600 text-white rounded-lg font-bold backdrop-blur-md transition-all border border-white/10"
+                className="absolute top-4 left-4 z-[60] px-3 py-1.5 md:px-4 md:py-2 bg-red-600/50 hover:bg-red-600 text-white rounded-lg text-xs md:text-sm font-bold backdrop-blur-md transition-all border border-white/10"
             >
-                🚪 退出房間
+                🚪 退出
             </button>
 
             {/* Opponents */}
@@ -150,44 +150,44 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                 const p = getPlayerAtPosition(pos);
                 const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
                 const layoutClasses = [
-                    "absolute top-8 flex-col items-center", // Top
-                    "absolute left-8 top-1/2 -translate-y-1/2 flex-col items-center rotate-90 origin-center", // Left
-                    "absolute right-8 top-1/2 -translate-y-1/2 flex-col items-center -rotate-90 origin-center" // Right
+                    "absolute top-4 md:top-8 left-1/2 -translate-x-1/2 flex-col items-center", // Top
+                    "absolute left-2 md:left-8 top-1/2 -translate-y-1/2 flex-col items-center rotate-90 origin-center hidden md:flex", // Left
+                    "absolute right-2 md:right-8 top-1/2 -translate-y-1/2 flex-col items-center -rotate-90 origin-center hidden md:flex" // Right
                 ][i];
 
                 return (
-                    <div key={pos} className={`${layoutClasses} flex text-white transition-all ${isCurrent ? 'scale-110' : 'opacity-80'}`}>
-                        <div className="flex flex-col items-center mb-2">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl mb-1 ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/40'}`}>
+                    <div key={pos} className={`${layoutClasses} text-white transition-all ${isCurrent ? 'scale-100 md:scale-110' : 'opacity-80 scale-90 md:scale-100'}`}>
+                        <div className="flex flex-col items-center mb-1 md:mb-2">
+                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg md:text-xl mb-1 ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/40'}`}>
                                 👤
                             </div>
-                            <div className="font-bold flex flex-col items-center">
+                            <div className="font-bold flex flex-col items-center text-xs md:text-base">
                                 <span>{p.name}</span>
-                                <span className="text-yellow-400 text-sm">💰 {p.score || 0}</span>
+                                <span className="text-yellow-400 text-[10px] md:text-sm">💰 {p.score || 0}</span>
                             </div>
                         </div>
-                        <div className="flex -space-x-8">
+                        <div className="flex -space-x-8 md:-space-x-8">
                             {Array(p.hand.length).fill(0).map((_, cardIdx) => (
-                                <div key={cardIdx} className="w-10 h-14 bg-blue-800 border border-white/20 rounded-md shadow-sm" />
+                                <div key={cardIdx} className="w-8 h-10 md:w-10 md:h-14 bg-blue-800 border border-white/20 rounded-md shadow-sm" />
                             ))}
                         </div>
                     </div>
                 );
             })}
 
-            {/* Table Center (Moved Up) */}
-            <div className="absolute top-[28%] z-10 bg-black/20 p-8 rounded-2xl border border-white/10 flex flex-col items-center min-w-[350px] min-h-[220px] backdrop-blur-sm">
-                <div className="text-white/20 text-xs font-bold uppercase tracking-wider mb-4 border-b border-white/5 w-full text-center pb-2">Table</div>
+            {/* Table Center (Adaptive) */}
+            <div className="relative z-10 bg-black/20 p-4 md:p-8 rounded-2xl border border-white/10 flex flex-col items-center min-w-[280px] md:min-w-[350px] min-h-[150px] md:min-h-[220px] backdrop-blur-sm mt-10 mb-20 md:mt-0 md:mb-0 md:absolute md:top-[30%]">
+                <div className="text-white/20 text-[10px] md:text-xs font-bold uppercase tracking-wider mb-2 md:mb-4 border-b border-white/5 w-full text-center pb-1 md:pb-2">Table</div>
                 {gameState.tableHand ? (
-                    <div className="flex space-x-2 animate-in fade-in zoom-in duration-300">
+                    <div className="flex space-x-1 md:space-x-2 animate-in fade-in zoom-in duration-300 transform scale-75 md:scale-100">
                         {gameState.tableHand.cards.map((c, i) => (
                             <Card key={`${c.rank}-${c.suit}-${i}`} card={c} disabled />
                         ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center h-full">
-                        <div className="text-white/30 italic text-lg mb-2">等待出牌...</div>
-                        <div className="w-12 h-1 bg-white/5 rounded-full" />
+                    <div className="flex flex-col items-center justify-center h-full py-10">
+                        <div className="text-white/30 italic text-sm md:text-lg mb-2">等待出牌...</div>
+                        <div className="w-10 h-1 bg-white/5 rounded-full" />
                     </div>
                 )}
             </div>
@@ -200,57 +200,51 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
             )}
 
             {/* Bottom Player Area (Consolidated Controls & Hand) */}
-            <div className="absolute bottom-4 flex flex-col items-center max-w-full w-full">
+            <div className="relative bottom-4 mt-auto flex flex-col items-center max-w-full w-full">
 
                 {/* 1. Integrated Info & Organize Bar (Above Hand) */}
-                <div className="w-full max-w-4xl px-4 flex flex-col items-center space-y-3 mb-6">
+                <div className="w-full max-w-4xl px-2 md:px-4 flex flex-col items-center space-y-2 md:space-y-3 mb-4 md:mb-6">
                     {/* Score Display (Centered) */}
-                    <div className="bg-black/60 backdrop-blur-md px-8 py-2 rounded-2xl border border-white/10 shadow-xl flex items-center space-x-4">
-                        <span className="text-white/60 text-xs font-bold tracking-widest">PERSONAL SCORE</span>
-                        <span className="text-3xl text-yellow-500 font-extrabold tabular-nums">
+                    <div className="bg-black/60 backdrop-blur-md px-4 py-1 md:px-8 md:py-2 rounded-2xl border border-white/10 shadow-xl flex items-center space-x-2 md:space-x-4">
+                        <span className="text-white/60 text-[10px] md:text-xs font-bold tracking-widest">PERSONAL SCORE</span>
+                        <span className="text-xl md:text-3xl text-yellow-500 font-extrabold tabular-nums">
                             {gameState.players[playerIndex].score.toLocaleString()}
                         </span>
                     </div>
 
                     {/* Button Rows */}
-                    <div className="flex flex-wrap justify-center gap-3">
+                    <div className="flex flex-wrap justify-center gap-2">
                         {/* Group A: Organize Buttons */}
-                        <div className="flex bg-black/40 p-1.5 rounded-xl border border-white/5 shadow-inner">
+                        <div className="flex bg-black/40 p-1 rounded-lg md:rounded-xl border border-white/5 shadow-inner">
                             <button
                                 onClick={handleGroupCards}
                                 disabled={selectedCards.length === 0}
-                                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-800 text-white rounded-lg text-sm font-black transition-all active:scale-95"
+                                className="px-3 md:px-4 py-1.5 md:py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-800 text-white rounded-lg text-xs md:text-sm font-black transition-all active:scale-95"
                             >
                                 🧩 組合
                             </button>
                             <button
                                 onClick={handleSmartSort}
-                                className="px-4 py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg text-sm font-black transition-all ml-2"
+                                className="px-3 md:px-4 py-1.5 md:py-2 bg-green-700 hover:bg-green-600 text-white rounded-lg text-xs md:text-sm font-black transition-all ml-1 md:ml-2"
                             >
                                 🪄 智能
-                            </button>
-                            <button
-                                onClick={handleNormalSort}
-                                className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg text-sm font-black transition-all ml-2"
-                            >
-                                🔢 排序
                             </button>
                         </div>
 
                         {/* Group B: Quick Hand Helpers (Always Visible) */}
-                        <div className="flex bg-white/5 backdrop-blur-sm p-1.5 rounded-xl border border-white/10">
+                        <div className="flex bg-white/5 backdrop-blur-sm p-1 rounded-lg md:rounded-xl border border-white/10 overflow-x-auto max-w-[280px] md:max-w-none scrollbar-hide">
                             {[
-                                { type: HandType.Pair, label: '👥 對子', key: 'Pair', color: 'bg-orange-600' },
-                                { type: HandType.Straight, label: '📏 順子', key: 'Straight', color: 'bg-green-600' },
-                                { type: HandType.FullHouse, label: '🏠 葫蘆', key: 'FullHouse', color: 'bg-blue-600' },
-                                { type: HandType.FourOfAKind, label: '💣 鐵支', key: 'FourOfAKind', color: 'bg-red-600' }
+                                { type: HandType.Pair, label: '👥 對', key: 'Pair', color: 'bg-orange-600' },
+                                { type: HandType.Straight, label: '📏 順', key: 'Straight', color: 'bg-green-600' },
+                                { type: HandType.FullHouse, label: '🏠 葫', key: 'FullHouse', color: 'bg-blue-600' },
+                                { type: HandType.FourOfAKind, label: '💣 鐵', key: 'FourOfAKind', color: 'bg-red-600' }
                             ].map((item) => (
                                 <button
                                     key={item.key}
                                     onClick={() => handleAutoPlayCombo(item.type)}
                                     disabled={!(availableCombos as any)[item.key]}
-                                    className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ml-1.5 first:ml-0 ${(availableCombos as any)[item.key]
-                                        ? `${item.color} text-white shadow-lg shadow-black/50 animate-pulse`
+                                    className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg font-bold text-[10px] md:text-xs transition-all ml-1 first:ml-0 whitespace-nowrap ${(availableCombos as any)[item.key]
+                                        ? `${item.color} text-white shadow-lg animate-pulse`
                                         : 'bg-black/40 text-white/20'
                                         }`}
                                 >
@@ -282,7 +276,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                 {/* 3. Player Hand */}
 
                 {/* Hand Display */}
-                <div className="flex -space-x-6 hover:-space-x-4 transition-all pb-8 overflow-x-auto max-w-full px-10 scrollbar-hide">
+                <div className="flex -space-x-8 md:-space-x-4 hover:-space-x-2 transition-all pb-8 overflow-x-auto max-w-full px-6 md:px-10 scrollbar-hide transform scale-90 md:scale-100">
                     {localHand.map((card, i) => {
                         // Logic to add extra spacing for groups
                         const isBoundary = i > 0 &&

@@ -123,16 +123,16 @@ const RoomContent = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#0a4d2e] flex flex-col items-center justify-center p-8">
-            <div className="w-full max-w-2xl bg-black/30 rounded-3xl p-10 border border-white/10 shadow-2xl backdrop-blur-xl">
-                <div className="flex justify-between items-start mb-8">
+        <div className="min-h-screen bg-[#0a4d2e] flex flex-col items-center py-6 px-4 md:p-8 overflow-y-auto">
+            <div className="w-full max-w-2xl bg-black/30 rounded-3xl p-6 md:p-10 border border-white/10 shadow-2xl backdrop-blur-xl">
+                <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
                     <div>
-                        <h1 className="text-4xl font-black text-white mb-2">房號: {roomId}</h1>
+                        <h1 className="text-2xl md:text-4xl font-black text-white mb-2">房號: {roomId}</h1>
                         <p className="text-yellow-500 font-bold">等待玩家加入中... ({players.length}/4)</p>
                     </div>
                     <button
                         onClick={copyLink}
-                        className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-bold border border-white/10 transition-all"
+                        className="w-full md:w-auto px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-bold border border-white/10 transition-all"
                     >
                         📋 複製邀請連結
                     </button>
@@ -142,7 +142,7 @@ const RoomContent = () => {
                     <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 text-sm font-bold animate-pulse">
                         ⚠️ {connectionError}
                         <br />
-                        <span className="text-xs font-normal opacity-70">請確認伺服器網址設定正確，且與網頁協定 (HTTP/HTTPS) 相符。</span>
+                        <span className="text-xs font-normal opacity-70 italic">請檢查連線設定</span>
                     </div>
                 )}
 
