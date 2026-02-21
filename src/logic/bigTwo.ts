@@ -34,20 +34,22 @@ export function compareCards(a: Card, b: Card): number {
  */
 function getStraightStrength(ranks: Rank[]): number {
     const sorted = [...ranks].sort((a, b) => a - b);
+    const sStr = JSON.stringify(sorted);
 
     // Check for 2, 3, 4, 5, 6 (Largest)
-    if (JSON.stringify(sorted) === JSON.stringify([Rank.Three, Rank.Four, Rank.Five, Rank.Six, Rank.Two])) {
-        return 100;
-    }
+    if (sStr === JSON.stringify([Rank.Three, Rank.Four, Rank.Five, Rank.Six, Rank.Two])) return 100;
 
     // Check for A, 2, 3, 4, 5 (Smallest)
-    if (JSON.stringify(sorted) === JSON.stringify([Rank.Three, Rank.Four, Rank.Five, Rank.Ace, Rank.Two])) {
-        return 0;
-    }
+    if (sStr === JSON.stringify([Rank.Three, Rank.Four, Rank.Five, Rank.Ace, Rank.Two])) return 0;
+
+    // Check for QK123 (Q, K, A, 2, 3)
+    if (sStr === JSON.stringify([3, 12, 13, 14, 15])) return 3;
+
+    // Check for K1234 (K, A, 2, 3, 4)
+    if (sStr === JSON.stringify([3, 4, 13, 14, 15])) return 4;
 
     // For others, use the highest rank in the sequence.
-    // 3, 4, 5, 6, 7 => 7
-    // 10, J, Q, K, A => A (14)
+    // e.g., J, Q, K, A, 2 -> 2 (15)
     return sorted[sorted.length - 1];
 }
 
@@ -95,15 +97,16 @@ export function getHand(cards: Card[]): Hand | null {
 
         const isStraight = (r: Rank[]) => {
             const s = [...r].sort((a, b) => a - b);
-            // Check normal sequence
+            // Check normal sequence (Handles JQKA2 natively since 11,12,13,14,15 are consecutive)
             const isNormal = s.every((val, i) => i === 0 || val === s[i - 1] + 1);
             if (isNormal) return true;
 
-            // Check A, 2, 3, 4, 5
-            if (JSON.stringify(s) === JSON.stringify([Rank.Three, Rank.Four, Rank.Five, Rank.Ace, Rank.Two])) return true;
-
-            // Check 2, 3, 4, 5, 6
-            if (JSON.stringify(s) === JSON.stringify([Rank.Three, Rank.Four, Rank.Five, Rank.Six, Rank.Two])) return true;
+            const sStr = JSON.stringify(s);
+            // Check wrapped straights
+            if (sStr === JSON.stringify([3, 4, 5, 14, 15])) return true; // A2345
+            if (sStr === JSON.stringify([3, 4, 5, 6, 15])) return true; // 23456
+            if (sStr === JSON.stringify([3, 12, 13, 14, 15])) return true; // QKA23
+            if (sStr === JSON.stringify([3, 4, 13, 14, 15])) return true; // KA234
 
             return false;
         };
@@ -111,14 +114,21 @@ export function getHand(cards: Card[]): Hand | null {
         const isFlush = suits.every(s => s === suits[0]);
         const straight = isStraight(ranks);
 
+        const getStraightSuit = () => {
+            const str = getStraightStrength(ranks);
+            if (str === 100 || str === 0) return sorted.find(c => c.rank === Rank.Two)!.suit; // 23456 and A2345 use 2
+            if (str === 3 && JSON.stringify([...ranks].sort((a, b) => a - b)) === JSON.stringify([3, 12, 13, 14, 15])) return sorted.find(c => c.rank === Rank.Three)!.suit; // QKA23 use 3
+            if (str === 4 && JSON.stringify([...ranks].sort((a, b) => a - b)) === JSON.stringify([3, 4, 13, 14, 15])) return sorted.find(c => c.rank === Rank.Four)!.suit; // KA234 use 4
+            return sorted[sorted.length - 1].suit; // normal (including JQKA2 using 2)
+        };
+
         // Straight Flush
         if (straight && isFlush) {
             return {
                 type: HandType.StraightFlush,
                 cards: sorted,
                 value: getStraightStrength(ranks),
-                // Special rule for 23456: only compare 2's suit
-                suitValue: getStraightStrength(ranks) === 100 ? sorted.find(c => c.rank === Rank.Two)!.suit : sorted[sorted.length - 1].suit
+                suitValue: getStraightSuit()
             };
         }
 
@@ -146,7 +156,7 @@ export function getHand(cards: Card[]): Hand | null {
                 type: HandType.Straight,
                 cards: sorted,
                 value: getStraightStrength(ranks),
-                suitValue: getStraightStrength(ranks) === 100 ? sorted.find(c => c.rank === Rank.Two)!.suit : sorted[sorted.length - 1].suit
+                suitValue: getStraightSuit()
             };
         }
     }
@@ -305,6 +315,10 @@ export function findValidFiveCardHands(hand: Card[], table: Hand | null, type: H
         if ([3, 4, 5, 14, 15].every(r => byRank[r])) possibleStraights.push([3, 4, 5, 14, 15]);
         // 23456 (3,4,5,6,15)
         if ([3, 4, 5, 6, 15].every(r => byRank[r])) possibleStraights.push([3, 4, 5, 6, 15]);
+        // QKA23 (3,12,13,14,15)
+        if ([3, 12, 13, 14, 15].every(r => byRank[r])) possibleStraights.push([3, 12, 13, 14, 15]);
+        // KA234 (3,4,13,14,15)
+        if ([3, 4, 13, 14, 15].every(r => byRank[r])) possibleStraights.push([3, 4, 13, 14, 15]);
 
         for (const sr of possibleStraights) {
             // Optimization: Just take one card of each rank for now
