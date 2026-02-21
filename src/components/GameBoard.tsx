@@ -143,199 +143,141 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
         return () => window.removeEventListener('resize', checkOrientation);
     }, []);
 
-    // Helper to render an opponent component
-    const renderOpponent = (pos: number, className: string = "") => {
-        const p = getPlayerAtPosition(pos);
-        const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
-        return (
-            <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-105 md:scale-110' : 'opacity-70 scale-90'} ${className}`}>
-                <div className="relative mb-0.5">
-                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-sm md:text-xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.5)]' : 'bg-black/50 border border-white/10'}`}>
-                        👤
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-6 h-6 md:w-7 md:h-7 rounded-full border border-white flex items-center justify-center font-black text-[10px]">
-                        {p.hand.length}
-                    </div>
-                </div>
-                <div className="text-white font-bold text-[8px] md:text-[10px] text-center max-w-[80px] truncate leading-tight">{p.name}</div>
-                <div className="text-yellow-400 text-[8px] md:text-[9px] font-bold">💰 {p.score.toLocaleString()}</div>
-                <div className={`flex -space-x-12 mt-1 transform scale-[0.3] md:scale-[0.5] origin-top`}>
-                    {Array(Math.min(p.hand.length, 10)).fill(0).map((_, i) => (
-                        <div key={i} className="w-8 h-12 bg-blue-800 border border-white/20 rounded-md shadow-sm" />
-                    ))}
-                </div>
-            </div>
-        );
-    };
-
     return (
-        <div className="fixed inset-0 w-full h-screen bg-[#1a472a] overflow-hidden touch-none select-none">
+        <div className="fixed inset-0 w-full h-screen bg-[#1a472a] flex flex-col items-center overflow-hidden touch-none select-none">
             {/* Immersive Background */}
-            <div className="fixed inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
-                <div className="w-[150vw] h-[150vw] max-w-[1200px] border-[16px] border-white/5 rounded-full" />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
-            </div>
+            <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-black/20 via-transparent to-black/40" />
 
-            {/* Common UI: Exit & Score */}
-            <button onClick={onExit} className="absolute left-4 top-4 z-[60] px-4 py-1.5 bg-red-900/40 hover:bg-red-800 text-white rounded-xl text-[10px] md:text-xs font-black border border-red-500/20 flex items-center shadow-2xl active:scale-90 transition-all">
-                🚪 <span className="ml-1">退出</span>
-            </button>
-            <div className="absolute right-4 top-4 z-[60] bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex flex-col items-end shadow-xl">
-                <span className="text-[8px] text-white/40 font-black uppercase tracking-widest">Global Score</span>
-                <span className="text-sm md:text-xl text-yellow-500 font-black leading-none">{gameState.players[playerIndex].score.toLocaleString()}</span>
-            </div>
+            {/* Top Area: All 3 Opponents (20vh) */}
+            <div className="w-full h-[20vh] bg-black/30 backdrop-blur-sm border-b border-white/5 z-20 flex flex-col items-center relative flex-none">
+                {/* Status Overlay */}
+                <div className="w-full flex justify-between items-start px-4 pt-2 absolute top-0 left-0 right-0 z-50 pointer-events-none">
+                    <button onClick={onExit} className="pointer-events-auto px-4 py-1.5 bg-red-900/40 hover:bg-red-800 text-white rounded-xl text-[10px] md:text-sm font-black border border-red-500/20 shadow-xl transition-all active:scale-90">
+                        🚪 <span className="ml-1">退出</span>
+                    </button>
+                    <div className="bg-black/40 px-3 py-1.5 rounded-xl border border-white/10 flex flex-col items-end shadow-xl">
+                        <span className="text-[8px] text-white/40 font-black uppercase tracking-widest">Global Score</span>
+                        <span className="text-xs md:text-lg text-yellow-500 font-black leading-none">{gameState.players[playerIndex].score.toLocaleString()}</span>
+                    </div>
+                </div>
 
-            {isLandscape ? (
-                /* LANDSCAPE LAYOUT: Immersive Table Style */
-                <div className="w-full h-full relative flex flex-col">
-                    {/* Opponents (Top Middle) */}
-                    <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20">
-                        {renderOpponent(2)}
-                    </div>
-                    {/* Opponents (Left) */}
-                    <div className="absolute left-6 top-1/2 -translate-y-2/3 z-20">
-                        {renderOpponent(1)}
-                    </div>
-                    {/* Opponents (Right) */}
-                    <div className="absolute right-6 top-1/2 -translate-y-2/3 z-20">
-                        {renderOpponent(3)}
-                    </div>
-
-                    {/* Central Table */}
-                    <div className="flex-1 flex items-center justify-center z-10">
-                        <div className="w-full max-w-2xl aspect-[3/2] bg-black/10 rounded-[60px] border border-white/5 flex flex-col items-center justify-center relative shadow-inner mx-20">
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5">
-                                <span className="text-6xl font-black italic tracking-[1em] text-white">SHENMAO</span>
-                            </div>
-                            {gameState.tableHand ? (
-                                <div className="flex space-x-2 animate-in fade-in zoom-in duration-300 transform scale-100 md:scale-125 lg:scale-150">
-                                    {gameState.tableHand.cards.map((c, i) => (
-                                        <Card key={`${c.rank}-${c.suit}-${i}`} card={c} disabled />
+                {/* Opponents Row - Unified Scale */}
+                <div className="flex w-full h-full max-w-6xl justify-around items-center px-4 pt-4">
+                    {[1, 2, 3].map((pos) => {
+                        const p = getPlayerAtPosition(pos);
+                        const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
+                        return (
+                            <div key={pos} className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-110' : 'opacity-70 scale-90'}`}>
+                                <div className="relative mb-1">
+                                    <div className={`w-10 h-10 md:w-16 md:h-16 rounded-full flex items-center justify-center text-xl md:text-3xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/50 border border-white/10'}`}>
+                                        👤
+                                    </div>
+                                    <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-6 h-6 md:w-8 md:h-8 rounded-full border-2 border-white flex items-center justify-center font-black text-[10px] md:text-xs">
+                                        {p.hand.length}
+                                    </div>
+                                </div>
+                                <div className="text-white font-bold text-[10px] md:text-xs text-center max-w-[70px] md:max-w-none truncate leading-none mb-0.5">{p.name}</div>
+                                <div className="text-yellow-400 text-[10px] md:text-xs font-bold leading-none">💰 {p.score.toLocaleString()}</div>
+                                <div className="flex -space-x-12 mt-1 transform scale-[0.3] md:scale-[0.5] origin-top">
+                                    {Array(Math.min(p.hand.length, 10)).fill(0).map((_, i) => (
+                                        <div key={i} className="w-8 h-12 bg-blue-800 border border-white/20 rounded-md shadow-md" />
                                     ))}
                                 </div>
-                            ) : (
-                                <div className="text-white/10 text-sm italic">Place your cards on the table</div>
-                            )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Middle Area: Table (30vh) */}
+            <div className="w-full h-[30vh] flex items-center justify-center px-4 relative z-10 flex-none">
+                <div className="w-full max-w-4xl h-[85%] bg-black/10 rounded-[40px] border border-white/5 flex items-center justify-center relative shadow-inner overflow-hidden">
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5">
+                        <span className="text-5xl md:text-8xl font-black italic tracking-[1em] text-white">CENTER</span>
+                    </div>
+                    {gameState.tableHand ? (
+                        <div className="flex space-x-1 md:space-x-4 animate-in fade-in zoom-in duration-300 transform scale-[0.75] sm:scale-100 md:scale-125">
+                            {gameState.tableHand.cards.map((c, i) => (
+                                <Card key={`${c.rank}-${c.suit}-${i}`} card={c} disabled />
+                            ))}
                         </div>
+                    ) : (
+                        <div className="text-white/10 text-xs italic tracking-widest uppercase">Waiting for play...</div>
+                    )}
+                </div>
+                {error && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-6 py-3 rounded-2xl shadow-2xl z-50 animate-bounce text-sm font-bold border border-white/20">
+                        {error}
                     </div>
+                )}
+            </div>
 
-                    {/* Right Side Thumb Zone (Controls) */}
-                    <div className="absolute right-6 bottom-40 z-50 flex flex-col space-y-4">
-                        <button onClick={() => handlePlay()} disabled={!isMyTurn || selectedCards.length === 0} className="w-24 h-24 bg-white text-black font-black rounded-full shadow-2xl active:scale-95 disabled:opacity-20 text-xl border-4 border-black/10 transition-all flex items-center justify-center">出牌</button>
-                        <button onClick={handlePass} disabled={!isMyTurn || gameState.tableHand === null} className="w-20 h-20 bg-red-600 text-white font-black rounded-full shadow-2xl active:scale-95 disabled:opacity-20 text-sm border-4 border-black/10 transition-all flex items-center justify-center">PASS</button>
-                    </div>
+            {/* Bottom Area: Controls & Hand (50vh) */}
+            <div className="flex-1 w-full flex flex-col items-center justify-between pb-8 md:pb-12 pt-4 z-40 bg-gradient-to-t from-black/80 via-black/20 to-transparent">
+                <div className="w-full max-w-6xl h-full flex flex-col items-center justify-between">
 
-                    {/* Bottom Area: Hand & Tools */}
-                    <div className="w-full h-1/3 flex flex-col items-center justify-end pb-4 bg-gradient-to-t from-black/60 to-transparent">
-                        <div className="flex gap-2 mb-4 bg-black/40 p-1 rounded-2xl border border-white/10 shadow-xl overflow-x-auto max-w-[80%]">
-                            <button onClick={handleGroupCards} disabled={selectedCards.length === 0} className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-black disabled:opacity-20">組合</button>
-                            <button onClick={handleSmartSort} className="px-4 py-2 bg-emerald-700 text-white rounded-lg text-xs font-black">智能</button>
-                            <div className="w-px bg-white/10 mx-1" />
+                    {/* Organize Tools */}
+                    <div className="w-full flex flex-wrap justify-center gap-2 px-2">
+                        <div className="flex bg-black/60 p-1 rounded-xl border border-white/10 shadow-xl">
+                            <button onClick={handleGroupCards} disabled={selectedCards.length === 0} className="px-5 py-2 bg-indigo-600 text-white rounded-lg text-xs font-black active:scale-95 disabled:opacity-20">組合</button>
+                            <button onClick={handleSmartSort} className="px-5 py-2 bg-emerald-700 text-white rounded-lg text-xs font-black ml-2 active:scale-95">智能</button>
+                        </div>
+                        <div className="flex bg-white/10 backdrop-blur-md p-1 rounded-xl border border-white/10 items-center">
                             {Object.entries(availableCombos).map(([key, avail]) => (
-                                <button key={key} onClick={() => handleAutoPlayCombo(HandType[key as keyof typeof HandType])} disabled={!avail} className={`px-4 py-2 rounded-lg font-bold text-xs ${avail ? 'bg-white/20 text-white' : 'bg-black/20 text-white/10'}`}>
+                                <button key={key} onClick={() => handleAutoPlayCombo(HandType[key as keyof typeof HandType])} disabled={!avail} className={`px-4 py-2 rounded-lg font-bold text-[10px] md:text-sm ml-1 first:ml-0 whitespace-nowrap ${avail ? 'bg-white/20 text-white animate-pulse' : 'bg-black/20 text-white/5'}`}>
                                     {key === 'Pair' ? '對子' : key === 'Straight' ? '順子' : key === 'FullHouse' ? '葫蘆' : '鐵支'}
                                 </button>
                             ))}
                         </div>
-                        <div className="flex -space-x-10 transform scale-110 lg:scale-125 origin-bottom">
-                            {localHand.map((card) => (
-                                <Card key={`${card.rank}-${card.suit}`} card={card} selected={selectedCards.some(c => c.rank === card.rank && c.suit === card.suit)} onClick={() => toggleCardSelection(card)} />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                /* PORTRAIT LAYOUT: Stacked Style (Optimized 20/30/50 logic) */
-                <div className="w-full h-full flex flex-col">
-                    {/* Opponents Top Row (20vh) */}
-                    <div className="w-full h-[20vh] flex items-center justify-around px-2 pt-10">
-                        {renderOpponent(1)}
-                        {renderOpponent(2, "scale-110")}
-                        {renderOpponent(3)}
                     </div>
 
-                    {/* Table Center (30vh) */}
-                    <div className="w-full h-[30vh] flex items-center justify-center px-4 relative">
-                        <div className="w-full max-w-sm aspect-video bg-black/10 rounded-3xl border border-white/5 shadow-inner flex items-center justify-center">
-                            {gameState.tableHand ? (
-                                <div className="flex space-x-1 transform scale-75 md:scale-90">
-                                    {gameState.tableHand.cards.map((c, i) => (
-                                        <Card key={`${c.rank}-${c.suit}-${i}`} card={c} disabled />
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-white/5 text-[10px] italic">Waiting for turn...</div>
-                            )}
-                        </div>
-                        {error && (
-                            <div className="absolute bottom-0 bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold animate-bounce z-50">{error}</div>
-                        )}
+                    {/* Main Actions */}
+                    <div className="flex justify-center space-x-6 md:space-x-12 px-6 w-full">
+                        <button onClick={() => handlePlay()} disabled={!isMyTurn || selectedCards.length === 0} className="flex-1 max-w-[320px] py-4 md:py-8 bg-white text-black font-black rounded-[2rem] shadow-[0_8px_0_rgb(200,200,200)] active:translate-y-1 active:shadow-none transition-all disabled:opacity-20 text-xl md:text-4xl">出 牌</button>
+                        <button onClick={handlePass} disabled={!isMyTurn || gameState.tableHand === null} className="flex-1 max-w-[320px] py-4 md:py-8 bg-red-600 text-white font-black rounded-[2rem] shadow-[0_8px_0_rgb(180,0,0)] active:translate-y-1 active:shadow-none transition-all disabled:opacity-20 text-xl md:text-4xl">PASS</button>
                     </div>
 
-                    {/* Player Area (50vh) */}
-                    <div className="flex-1 flex flex-col items-center justify-between pb-6 pt-2 bg-gradient-to-t from-black/80 to-transparent">
-                        <div className="w-full flex flex-col items-center space-y-4">
-                            <div className="flex gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10 overflow-x-auto max-w-[90%]">
-                                <button onClick={handleGroupCards} disabled={selectedCards.length === 0} className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-black disabled:opacity-20">組合</button>
-                                <button onClick={handleSmartSort} className="px-3 py-1.5 bg-emerald-700 text-white rounded-lg text-[10px] font-black">智能</button>
-                                {Object.entries(availableCombos).map(([key, avail]) => (
-                                    <button key={key} onClick={() => handleAutoPlayCombo(HandType[key as keyof typeof HandType])} disabled={!avail} className={`px-2 py-1.5 rounded-lg font-bold text-[9px] ${avail ? 'bg-white/10 text-white' : 'bg-black/20 text-white/5'}`}>
-                                        {key === 'Pair' ? '對子' : key === 'Straight' ? '順子' : key === 'FullHouse' ? '葫蘆' : '鐵支'}
-                                    </button>
+                    {/* Hand Display (Centered & Scaled) */}
+                    <div className="w-full flex flex-col items-center">
+                        <div className="text-white/20 text-[10px] font-black uppercase tracking-[0.4em] mb-4">Player Hand</div>
+                        <div className="flex justify-center w-full px-10 overflow-visible">
+                            <div className="flex -space-x-14 md:-space-x-10 transform scale-[0.6] sm:scale-80 md:scale-110 lg:scale-[1.3] origin-bottom transition-transform duration-300">
+                                {localHand.map((card) => (
+                                    <Card key={`${card.rank}-${card.suit}`} card={card} selected={selectedCards.some(c => c.rank === card.rank && c.suit === card.suit)} onClick={() => toggleCardSelection(card)} />
                                 ))}
                             </div>
-                            <div className="flex space-x-6">
-                                <button onClick={() => handlePlay()} disabled={!isMyTurn || selectedCards.length === 0} className="px-14 py-3 bg-white text-black font-black rounded-2xl shadow-xl active:scale-95 disabled:opacity-20 text-lg">出牌</button>
-                                <button onClick={handlePass} disabled={!isMyTurn || gameState.tableHand === null} className="px-8 py-3 bg-red-600 text-white font-black rounded-2xl shadow-xl active:scale-95 disabled:opacity-20 text-sm">PASS</button>
-                            </div>
-                        </div>
-                        <div className="flex -space-x-12 transform scale-90 sm:scale-100 origin-bottom">
-                            {localHand.map((card) => (
-                                <Card key={`${card.rank}-${card.suit}`} card={card} selected={selectedCards.some(c => c.rank === card.rank && c.suit === card.suit)} onClick={() => toggleCardSelection(card)} />
-                            ))}
                         </div>
                     </div>
                 </div>
-            )}
+            </div>
 
             {/* Finish Screen */}
             {gameState.isFinished && (
-                <div className="absolute inset-0 bg-black/80 z-[100] flex flex-col items-center justify-center p-10 text-white">
-                    <div className="text-3xl text-yellow-500 mb-8 font-black animate-bounce text-center">
-                        🏆 恭喜 {gameState.players.find(p => p.hand.length === 0)?.name} 獲勝！
+                <div className="absolute inset-0 bg-black/90 z-[100] flex flex-col items-center justify-center p-10 text-white backdrop-blur-xl">
+                    <div className="text-4xl md:text-6xl text-yellow-500 mb-10 font-black animate-bounce text-center drop-shadow-2xl">
+                        🏆 WINNER: {gameState.players.find(p => p.hand.length === 0)?.name}
                     </div>
 
-                    <div className="space-y-4 text-2xl w-full max-w-md bg-black/40 p-6 rounded-3xl border border-white/10">
+                    <div className="space-y-4 w-full max-w-lg bg-white/5 p-8 rounded-[3rem] border border-white/10 shadow-2xl">
                         {gameState.players.map(p => (
-                            <div key={p.id} className="flex justify-between items-center border-b border-white/10 last:border-0 pb-4 last:pb-0">
+                            <div key={p.id} className="flex justify-between items-center border-b border-white/5 last:border-0 pb-4 last:pb-0">
                                 <div className="flex flex-col">
-                                    <span className="font-bold">{p.name}</span>
-                                    <span className="text-sm text-white/40">{p.hand.length} 張剩餘</span>
+                                    <span className="font-black text-lg md:text-2xl">{p.name}</span>
+                                    <span className="text-xs md:text-sm text-white/40">{p.hand.length} cards left</span>
                                 </div>
-                                <span className={`font-black text-3xl ${p.score >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                <span className={`font-black text-2xl md:text-4xl ${p.score >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                                     {p.score > 0 ? '+' : ''}{p.score.toLocaleString()} 💰
                                 </span>
                             </div>
                         ))}
                     </div>
 
-                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mt-12 w-full max-w-md">
-                        <button
-                            onClick={onNextGame}
-                            disabled={!isHost}
-                            className={`flex-1 py-4 font-black rounded-xl text-2xl shadow-[0_6px_0_rgb(180,100,0)] active:translate-y-1 transition-all ${isHost ? 'bg-yellow-500 hover:bg-yellow-400 text-black' : 'bg-gray-600 text-white/50 cursor-not-allowed shadow-[0_6px_0_rgb(50,50,50)]'}`}
-                        >
-                            {isHost ? "確認 (下一局)" : "等待房主..."}
+                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mt-12 w-full max-w-lg">
+                        <button onClick={onNextGame} disabled={!isHost} className={`flex-1 py-5 font-black rounded-2xl text-xl md:text-3xl transition-all ${isHost ? 'bg-yellow-500 text-black shadow-lg active:scale-95' : 'bg-gray-700 text-white/20 cursor-not-allowed'}`}>
+                            {isHost ? "NEXT GAME" : "WAITING..."}
                         </button>
-                        <button
-                            onClick={onExit}
-                            className="flex-1 py-4 bg-white/10 hover:bg-white/20 text-white font-black rounded-xl text-2xl border border-white/20 transition-all active:translate-y-1"
-                        >
-                            退出 (LOBBY)
-                        </button>
+                        <button onClick={onExit} className="flex-1 py-5 bg-white/10 text-white font-black rounded-2xl text-xl md:text-3xl border border-white/20 active:scale-95 transition-all">EXIT</button>
                     </div>
-
-                    {!isHost && <p className="mt-4 text-white/40 italic">請等待房主點擊下一局</p>}
                 </div>
             )}
         </div>
