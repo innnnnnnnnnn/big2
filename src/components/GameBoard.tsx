@@ -90,7 +90,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
     };
 
     const handlePass = () => {
-        playSound('pass');
         socket.emit("play_hand", { roomId, cards: null });
         setSelectedCards([]);
     };
