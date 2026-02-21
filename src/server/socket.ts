@@ -4,7 +4,12 @@ import { initializeGame, playTurn } from "../logic/game";
 import { GameState, Card, HandType } from "../logic/types";
 import { findValidPairs, findValidFiveCardHands } from "../logic/bigTwo";
 
-const httpServer = createServer();
+const httpServer = createServer((req, res) => {
+    if (req.url === "/") {
+        res.writeHead(200);
+        res.end("Game server is running!");
+    }
+});
 const io = new Server(httpServer, {
     cors: {
         origin: "*", // Allow all for local dev
