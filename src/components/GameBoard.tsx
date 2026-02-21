@@ -170,23 +170,29 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                                     {p.hand.length}
                                 </div>
                             </div>
-                            <div className="text-white font-bold text-sm md:text-base">{p.name}</div>
-                            <div className="text-yellow-400 text-xs font-bold">💰 {p.score.toLocaleString()}</div>
+                            <div className="text-white font-bold text-sm md:text-base text-center px-2">{p.name}</div>
+                            <div className="text-yellow-400 text-xs md:text-sm font-bold">💰 {p.score.toLocaleString()}</div>
+                            {/* Card Visuals for Top Opponent */}
+                            <div className="flex -space-x-8 md:-space-x-10 mt-2 transform scale-75 md:scale-90">
+                                {Array(Math.min(p.hand.length, 13)).fill(0).map((_, i) => (
+                                    <div key={i} className="w-8 h-12 md:w-10 md:h-14 bg-blue-800 border border-white/20 rounded-md shadow-md" />
+                                ))}
+                            </div>
                         </div>
                     );
                 })()}
             </div>
 
             {/* Middle Area: Table and Side Opponents */}
-            <div className="flex-1 w-full max-w-6xl relative flex items-center justify-center py-8 md:py-12">
+            <div className="flex-1 w-full max-w-7xl relative flex items-center justify-between px-4 md:px-10 py-4 md:py-8">
 
-                {/* Left Opponent (Absolute) */}
-                <div className="absolute left-4 md:left-12 top-1/2 -translate-y-1/2 z-20 hidden sm:flex flex-col items-center">
+                {/* Left Opponent */}
+                <div className="z-20 flex flex-col items-center">
                     {(() => {
                         const p = getPlayerAtPosition(1);
                         const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
                         return (
-                            <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-110' : 'opacity-70'}`}>
+                            <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-110' : 'opacity-80'}`}>
                                 <div className="relative mb-2">
                                     <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg md:text-xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/50'}`}>
                                         👤
@@ -195,62 +201,43 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                                         {p.hand.length}
                                     </div>
                                 </div>
-                                <div className="text-white font-bold text-xs md:text-sm max-w-[80px] truncate">{p.name}</div>
+                                <div className="text-white font-bold text-[10px] md:text-sm text-center max-w-[100px] break-words">{p.name}</div>
+                                <div className="text-yellow-400 text-[10px] md:text-xs font-bold">💰 {p.score.toLocaleString()}</div>
+                                {/* Card Visuals for Left Opponent (Compact) */}
+                                <div className="flex -space-x-14 md:-space-x-10 mt-2 transform scale-50 md:scale-75 origin-top">
+                                    {Array(Math.min(p.hand.length, 13)).fill(0).map((_, i) => (
+                                        <div key={i} className="w-8 h-12 md:w-10 md:h-14 bg-blue-800 border border-white/20 rounded-md shadow-md" />
+                                    ))}
+                                </div>
                             </div>
                         );
                     })()}
                 </div>
 
                 {/* Table Center (THEME) */}
-                <div className="relative z-10 bg-black/30 p-6 md:p-10 rounded-[40px] border border-white/10 flex flex-col items-center min-w-[300px] md:min-w-[480px] min-h-[160px] md:min-h-[240px] backdrop-blur-md shadow-2xl">
-                    <div className="text-white/20 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-4 border-b border-white/5 w-full text-center pb-2">Table Center</div>
+                <div className="relative z-10 mx-2 bg-black/30 p-4 md:p-8 rounded-[30px] md:rounded-[40px] border border-white/10 flex flex-col items-center flex-1 max-w-[320px] md:max-w-[500px] min-h-[140px] md:min-h-[220px] backdrop-blur-md shadow-2xl">
+                    <div className="text-white/20 text-[8px] md:text-xs font-black uppercase tracking-[0.1em] md:tracking-[0.2em] mb-3 md:mb-4 border-b border-white/5 w-full text-center pb-2">Table Center</div>
                     {gameState.tableHand ? (
-                        <div className="flex space-x-1 md:space-x-3 animate-in fade-in zoom-in duration-300 transform scale-75 md:scale-100">
+                        <div className="flex space-x-1 md:space-x-3 animate-in fade-in zoom-in duration-300 transform scale-[0.6] sm:scale-75 md:scale-100">
                             {gameState.tableHand.cards.map((c, i) => (
                                 <Card key={`${c.rank}-${c.suit}-${i}`} card={c} disabled />
                             ))}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center h-full py-8 text-white/30">
-                            <div className="text-sm md:text-xl italic mb-3">等待玩家出牌...</div>
-                            <div className="w-16 h-1 bg-white/10 rounded-full" />
+                        <div className="flex flex-col items-center justify-center h-full py-6 text-white/30">
+                            <div className="text-xs md:text-xl italic mb-2">Waiting...</div>
+                            <div className="w-12 h-0.5 bg-white/10 rounded-full" />
                         </div>
                     )}
-
-                    {/* Side Opponents Display on Mobile (Numeric only) */}
-                    <div className="absolute -left-16 sm:hidden flex flex-col space-y-4">
-                        {(() => {
-                            const p = getPlayerAtPosition(1);
-                            const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
-                            return (
-                                <div className={`flex items-center space-x-2 bg-black/40 p-1.5 rounded-full border ${isCurrent ? 'border-yellow-500' : 'border-white/10'}`}>
-                                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{p.hand.length}</div>
-                                    <span className="text-white text-[10px] pr-2 font-bold max-w-[40px] truncate">{p.name}</span>
-                                </div>
-                            );
-                        })()}
-                    </div>
-                    <div className="absolute -right-16 sm:hidden flex flex-col space-y-4">
-                        {(() => {
-                            const p = getPlayerAtPosition(3);
-                            const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
-                            return (
-                                <div className={`flex items-center space-x-2 bg-black/40 p-1.5 rounded-full border ${isCurrent ? 'border-yellow-500' : 'border-white/10'} flex-row-reverse`}>
-                                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{p.hand.length}</div>
-                                    <span className="text-white text-[10px] pl-2 font-bold max-w-[40px] truncate text-right">{p.name}</span>
-                                </div>
-                            );
-                        })()}
-                    </div>
                 </div>
 
-                {/* Right Opponent (Absolute) */}
-                <div className="absolute right-4 md:right-12 top-1/2 -translate-y-1/2 z-20 hidden sm:flex flex-col items-center">
+                {/* Right Opponent */}
+                <div className="z-20 flex flex-col items-center">
                     {(() => {
                         const p = getPlayerAtPosition(3);
                         const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
                         return (
-                            <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-110' : 'opacity-70'}`}>
+                            <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-110' : 'opacity-80'}`}>
                                 <div className="relative mb-2">
                                     <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg md:text-xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/50'}`}>
                                         👤
@@ -259,7 +246,14 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                                         {p.hand.length}
                                     </div>
                                 </div>
-                                <div className="text-white font-bold text-xs md:text-sm max-w-[80px] truncate">{p.name}</div>
+                                <div className="text-white font-bold text-[10px] md:text-sm text-center max-w-[100px] break-words">{p.name}</div>
+                                <div className="text-yellow-400 text-[10px] md:text-xs font-bold">💰 {p.score.toLocaleString()}</div>
+                                {/* Card Visuals for Right Opponent (Compact) */}
+                                <div className="flex -space-x-14 md:-space-x-10 mt-2 transform scale-50 md:scale-75 origin-top">
+                                    {Array(Math.min(p.hand.length, 13)).fill(0).map((_, i) => (
+                                        <div key={i} className="w-8 h-12 md:w-10 md:h-14 bg-blue-800 border border-white/20 rounded-md shadow-md" />
+                                    ))}
+                                </div>
                             </div>
                         );
                     })()}
