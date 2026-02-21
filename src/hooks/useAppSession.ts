@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import liff from "@line/liff";
 
 export interface AppUser {
@@ -78,5 +78,7 @@ export const useAppSession = () => {
         window.location.href = (process.env.NEXT_PUBLIC_BASE_PATH || "/big2") + "/auth/signin/";
     };
 
-    return { session: user ? { user } : null, status, login, logout };
+    const sessionObject = useMemo(() => (user ? { user } : null), [user]);
+
+    return { session: sessionObject, status, login, logout };
 };

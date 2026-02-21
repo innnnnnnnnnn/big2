@@ -34,15 +34,19 @@ const RoomContent = () => {
     }, [myId, myName, players, currentIsHost]);
 
     useEffect(() => {
-        if (!session) return;
+        if (!myId || !roomId) return;
 
+        console.log("[Room] Effect Triggered: Joining...");
         const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3002";
-        socket = io(wsUrl);
+
+        if (!socket || !socket.connected) {
+            socket = io(wsUrl);
+        }
 
         socket.emit("join_room", {
             roomId,
-            name: session.user?.name,
-            userId: (session.user as any).id
+            name: myName,
+            userId: myId
         });
 
         socket.on("room_update", (data) => {
@@ -67,7 +71,7 @@ const RoomContent = () => {
         return () => {
             socket.disconnect();
         };
-    }, [session, roomId]);
+    }, [myId, roomId, myName]);
 
     if (!session) return null;
 
