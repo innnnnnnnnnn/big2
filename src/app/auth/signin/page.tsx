@@ -34,7 +34,7 @@ const SignInPage = () => {
         }
 
         try {
-            await liff.init({ liffId });
+            await liff.init({ liffId: liffId.trim() });
             if (!liff.isLoggedIn()) {
                 liff.login();
             } else {

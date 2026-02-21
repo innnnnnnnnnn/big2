@@ -32,8 +32,8 @@ jobs:
       - name: Build with Next.js
         run: npx next build
         env:
-          NEXT_PUBLIC_LIFF_ID: ${{ secrets.NEXT_PUBLIC_LIFF_ID }}
-          NEXT_PUBLIC_WS_URL: ${{ secrets.NEXT_PUBLIC_WS_URL }}
+          NEXT_PUBLIC_LIFF_ID: ${{ secrets.NEXT_PUBLIC_LIFF_ID || vars.NEXT_PUBLIC_LIFF_ID }}
+          NEXT_PUBLIC_WS_URL: ${{ secrets.NEXT_PUBLIC_WS_URL || vars.NEXT_PUBLIC_WS_URL }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

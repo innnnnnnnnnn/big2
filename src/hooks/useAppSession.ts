@@ -33,8 +33,8 @@ export const useAppSession = () => {
             // 2. Check LIFF if ID exists
             if (liffId) {
                 try {
-                    console.log("[AppSession] Initializing LIFF:", liffId);
-                    await liff.init({ liffId });
+                    console.log("[AppSession] Initializing LIFF:", liffId.trim());
+                    await liff.init({ liffId: liffId.trim() });
                     if (liff.isLoggedIn()) {
                         const profile = await liff.getProfile();
                         console.log("[AppSession] LIFF Profile found:", profile.displayName);
