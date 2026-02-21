@@ -161,10 +161,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                     <button onClick={onExit} className="pointer-events-auto px-4 py-1.5 bg-red-900/30 hover:bg-red-800/80 text-white rounded-xl text-[10px] md:text-sm font-black border border-red-400/30 shadow-[0_4px_15px_rgba(220,38,38,0.3)] backdrop-blur-sm transition-all active:scale-95">
                         <span className="drop-shadow-md">🚪 退出</span>
                     </button>
-                    <div className="bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex flex-col items-end shadow-xl">
-                        <span className="text-[8px] text-emerald-400 font-black uppercase tracking-widest drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]">Global Score</span>
-                        <span className="text-xs md:text-lg text-yellow-400 font-black leading-none drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]">{gameState.players[playerIndex].score.toLocaleString()}</span>
-                    </div>
+                    {/* Score section moved to bottom bar */}
                 </div>
 
                 {/* Opponents Row - Unified Scale */}
@@ -222,28 +219,43 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
             <div className="flex-1 w-full flex flex-col items-center justify-end pb-[max(1.5rem,env(safe-area-inset-bottom))] md:pb-[max(2.5rem,env(safe-area-inset-bottom))] z-40 bg-gradient-to-t from-black via-[#041208]/90 to-transparent overflow-visible">
                 <div className="w-full max-w-6xl flex flex-col items-center justify-end">
 
-                    {/* All Controls (Tools & Actions) */}
-                    <div className="w-full flex flex-col items-center gap-2 px-2 mb-2 md:mb-4">
-                        {/* Row 1: Organize Tools */}
-                        <div className="w-full flex flex-wrap justify-center gap-2 px-2">
-                            <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                                <button onClick={handleGroupCards} disabled={selectedCards.length === 0} className="px-5 py-2.5 bg-gradient-to-b from-indigo-500 to-indigo-700 text-white rounded-xl text-xs md:text-sm font-black active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.5)] border border-indigo-400/50 transition-all">組合</button>
-                                <button onClick={handleSmartSort} className="px-5 py-2.5 bg-gradient-to-b from-emerald-600 to-emerald-800 text-white rounded-xl text-xs md:text-sm font-black ml-2 active:scale-95 shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.5)] border border-emerald-500/50 transition-all">智能</button>
+                    {/* All Controls (Score, Tools & Actions) */}
+                    <div className="w-full flex flex-row flex-wrap xl:flex-nowrap items-center justify-between px-2 md:px-4 mb-2 md:mb-4 gap-2">
+
+                        {/* 1. Player Info (Left) */}
+                        <div className="flex bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] items-center shrink-0 order-1 w-[48%] xl:w-auto">
+                            <div className="relative shrink-0 mr-2">
+                                <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xl md:text-2xl border bg-gradient-to-b from-yellow-400 to-yellow-600 border-yellow-200 shadow-[0_0_10px_rgba(234,179,8,0.5)] text-black`}>
+                                    👤
+                                </div>
                             </div>
-                            <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 items-center shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-hide max-w-[80vw]">
+                            <div className="flex flex-col truncate">
+                                <span className="text-white font-bold text-[10px] md:text-xs leading-none drop-shadow-md truncate">{gameState.players[playerIndex].name}</span>
+                                <span className="text-emerald-400 text-xs md:text-sm font-bold leading-none drop-shadow-[0_0_5px_rgba(52,211,153,0.3)] mt-1 truncate">💰 {gameState.players[playerIndex].score.toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        {/* 3. Action Buttons (Right, order-2 on mobile so they pair with score row) */}
+                        <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] shrink-0 order-2 xl:order-3 w-[48%] xl:w-auto overflow-hidden">
+                            <button onClick={() => handlePlay()} disabled={!isMyTurn || selectedCards.length === 0} className="flex-1 xl:flex-none px-2 sm:px-4 xl:px-10 py-2.5 bg-gradient-to-b from-yellow-400 to-yellow-600 text-yellow-950 font-black rounded-xl active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_10px_rgba(255,255,255,0.6),0_2px_5px_rgba(0,0,0,0.5)] border border-yellow-300 transition-all text-[11px] sm:text-xs xl:text-base">出 牌</button>
+                            <button onClick={handlePass} disabled={!isMyTurn || gameState.tableHand === null} className="flex-1 xl:flex-none px-2 sm:px-4 xl:px-10 py-2.5 bg-gradient-to-b from-red-600 to-red-800 text-white font-black rounded-xl ml-1 active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_10px_rgba(255,255,255,0.3),0_2px_5px_rgba(0,0,0,0.5)] border border-red-500 transition-all text-[11px] sm:text-xs xl:text-base">PASS</button>
+                        </div>
+
+                        {/* 2. Organize Tools (Center, order-3 drops to next line on smaller screens) */}
+                        <div className="flex flex-1 justify-center gap-1 sm:gap-2 w-full xl:w-auto order-3 xl:order-2">
+                            <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] shrink-0">
+                                <button onClick={handleGroupCards} disabled={selectedCards.length === 0} className="px-3 xl:px-5 py-2.5 bg-gradient-to-b from-indigo-500 to-indigo-700 text-white rounded-xl text-[10px] xl:text-sm font-black active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.5)] border border-indigo-400/50 transition-all">組合</button>
+                                <button onClick={handleSmartSort} className="px-3 xl:px-5 py-2.5 bg-gradient-to-b from-emerald-600 to-emerald-800 text-white rounded-xl text-[10px] xl:text-sm font-black ml-1 active:scale-95 shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.5)] border border-emerald-500/50 transition-all">智能</button>
+                            </div>
+                            <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 items-center shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-hide min-w-[200px] flex-nowrap">
                                 {Object.entries(availableCombos).map(([key, avail]) => (
-                                    <button key={key} onClick={() => handleAutoPlayCombo(HandType[key as keyof typeof HandType])} disabled={!avail} className={`px-4 py-2.5 rounded-xl font-bold text-[10px] md:text-xs ml-1 first:ml-0 whitespace-nowrap transition-all ${avail ? 'bg-gradient-to-b from-white/30 to-white/10 border border-white/30 text-white shadow-[0_0_15px_rgba(255,255,255,0.2),inset_0_2px_5px_rgba(255,255,255,0.3)] animate-pulse' : 'bg-transparent text-white/20'}`}>
+                                    <button key={key} onClick={() => handleAutoPlayCombo(HandType[key as keyof typeof HandType])} disabled={!avail} className={`px-2 md:px-3 lg:px-4 py-2.5 rounded-xl font-bold text-[10px] xl:text-xs ml-1 first:ml-0 whitespace-nowrap transition-all flex-none ${avail ? 'bg-gradient-to-b from-white/30 to-white/10 border border-white/30 text-white shadow-[0_0_15px_rgba(255,255,255,0.2),inset_0_2px_5px_rgba(255,255,255,0.3)] animate-pulse' : 'bg-transparent text-white/20'}`}>
                                         {key === 'Pair' ? '對子' : key === 'Straight' ? '順子' : key === 'FullHouse' ? '葫蘆' : '鐵支'}
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Row 2: Action Buttons (Same size as organize tools) */}
-                        <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] mt-1">
-                            <button onClick={() => handlePlay()} disabled={!isMyTurn || selectedCards.length === 0} className="px-12 md:px-16 py-2.5 bg-gradient-to-b from-yellow-400 to-yellow-600 text-yellow-950 font-black rounded-xl active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_10px_rgba(255,255,255,0.6),0_2px_5px_rgba(0,0,0,0.5)] border border-yellow-300 transition-all text-sm md:text-base">出 牌</button>
-                            <button onClick={handlePass} disabled={!isMyTurn || gameState.tableHand === null} className="px-12 md:px-16 py-2.5 bg-gradient-to-b from-red-600 to-red-800 text-white font-black rounded-xl ml-2 active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_10px_rgba(255,255,255,0.3),0_2px_5px_rgba(0,0,0,0.5)] border border-red-500 transition-all text-sm md:text-base">PASS</button>
-                        </div>
                     </div>
 
                     {/* Hand Display (Maximized Scale) */}
