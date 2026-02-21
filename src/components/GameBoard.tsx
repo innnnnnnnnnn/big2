@@ -156,23 +156,23 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
             </div>
 
             {/* Top Area: Opponent 2 (Opposite) */}
-            <div className="w-full pt-4 md:pt-10 flex flex-col items-center z-20 flex-none h-[15vh]">
+            <div className="w-full pt-2 md:pt-6 flex flex-col items-center z-20 flex-none h-[12vh]">
                 {(() => {
                     const p = getPlayerAtPosition(2);
                     const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
                     return (
                         <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-105 md:scale-110' : 'opacity-80 scale-90'}`}>
                             <div className="relative mb-1">
-                                <div className={`w-10 h-10 md:w-16 md:h-16 rounded-full flex items-center justify-center text-lg md:text-2xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.6)]' : 'bg-black/50'}`}>
+                                <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg md:text-2xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.6)]' : 'bg-black/50'}`}>
                                     👤
                                 </div>
-                                <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-6 h-6 md:w-8 md:h-8 rounded-full border-2 border-white flex items-center justify-center font-black text-xs md:text-sm">
+                                <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-6 h-6 md:w-7 md:h-7 rounded-full border-2 border-white flex items-center justify-center font-black text-[10px] md:text-xs">
                                     {p.hand.length}
                                 </div>
                             </div>
-                            <div className="text-white font-bold text-[10px] md:text-sm text-center px-1 leading-none truncate max-w-[120px]">{p.name}</div>
-                            <div className="text-yellow-400 text-[10px] md:text-xs font-bold leading-none mt-1">💰 {p.score.toLocaleString()}</div>
-                            <div className="flex -space-x-12 md:-space-x-10 mt-2 transform scale-[0.35] md:scale-75 origin-top">
+                            <div className="text-white font-bold text-[10px] md:text-xs text-center px-1 leading-none truncate max-w-[120px]">{p.name}</div>
+                            <div className="text-yellow-400 text-[10px] md:text-[10px] font-bold leading-none mt-1">💰 {p.score.toLocaleString()}</div>
+                            <div className="flex -space-x-12 md:-space-x-10 mt-1 transform scale-[0.3] md:scale-50 origin-top">
                                 {Array(Math.min(p.hand.length, 13)).fill(0).map((_, i) => (
                                     <div key={i} className="w-8 h-12 md:w-10 md:h-14 bg-blue-800 border border-white/20 rounded-md shadow-md" />
                                 ))}
@@ -183,25 +183,25 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
             </div>
 
             {/* Middle Area: Table and Side Opponents */}
-            <div className="flex-1 w-full max-w-7xl relative flex items-center justify-between px-2 md:px-10 z-10 min-h-0">
+            <div className="flex-1 w-full max-w-7xl relative flex items-center justify-between px-2 md:px-10 z-10 min-h-0 h-[58vh]">
 
                 {/* Left Opponent */}
-                <div className="z-20 flex flex-col items-center flex-none w-[15%]">
+                <div className="z-20 flex flex-col items-center flex-none w-[18%]">
                     {(() => {
                         const p = getPlayerAtPosition(1);
                         const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
                         return (
                             <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-105 md:scale-110' : 'opacity-80 scale-90'}`}>
                                 <div className="relative mb-1">
-                                    <div className={`w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm md:text-lg ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/50'}`}>
+                                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg md:text-2xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/50'}`}>
                                         👤
                                     </div>
-                                    <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-5 h-5 md:w-6 md:h-6 rounded-full border border-white flex items-center justify-center font-black text-[10px]">
+                                    <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-6 h-6 md:w-7 md:h-7 rounded-full border-2 border-white flex items-center justify-center font-black text-[10px] md:text-xs">
                                         {p.hand.length}
                                     </div>
                                 </div>
-                                <div className="text-white font-bold text-[8px] md:text-xs text-center leading-none mb-1 break-words max-w-[60px] md:max-w-none">{p.name}</div>
-                                <div className="text-yellow-400 text-[8px] md:text-[10px] font-bold leading-none mt-0.5">💰 {p.score.toLocaleString()}</div>
+                                <div className="text-white font-bold text-[10px] md:text-xs text-center leading-none mb-1 break-words max-w-[80px] md:max-w-none">{p.name}</div>
+                                <div className="text-yellow-400 text-[10px] md:text-[10px] font-bold leading-none mt-0.5">💰 {p.score.toLocaleString()}</div>
                                 <div className="flex -space-x-12 md:-space-x-11 mt-1 transform scale-[0.3] md:scale-50 origin-top">
                                     {Array(Math.min(p.hand.length, 13)).fill(0).map((_, i) => (
                                         <div key={i} className="w-8 h-12 md:w-10 md:h-14 bg-blue-800 border border-white/20 rounded-md shadow-md" />
@@ -213,38 +213,38 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                 </div>
 
                 {/* Table Center */}
-                <div className="relative z-10 mx-1 bg-black/20 p-4 md:p-8 rounded-[30px] md:rounded-[40px] border border-white/5 flex flex-col items-center justify-center flex-1 max-h-[80%] backdrop-blur-md shadow-2xl">
+                <div className="relative z-10 mx-1 bg-black/20 p-2 md:p-6 rounded-[30px] md:rounded-[40px] border border-white/5 flex flex-col items-center justify-center flex-1 h-[85%] max-h-full backdrop-blur-md shadow-2xl">
                     {gameState.tableHand ? (
-                        <div className="flex space-x-1 md:space-x-4 animate-in fade-in zoom-in duration-300 transform scale-[0.7] sm:scale-90 md:scale-125 lg:scale-150">
+                        <div className="flex space-x-1 md:space-x-3 animate-in fade-in zoom-in duration-300 transform scale-[0.6] sm:scale-75 md:scale-100 lg:scale-110">
                             {gameState.tableHand.cards.map((c, i) => (
                                 <Card key={`${c.rank}-${c.suit}-${i}`} card={c} disabled />
                             ))}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-4 text-white/10">
-                            <div className="text-sm md:text-xl italic mb-2">Waiting...</div>
-                            <div className="w-12 h-0.5 bg-white/5 rounded-full" />
+                        <div className="flex flex-col items-center justify-center py-2 text-white/10">
+                            <div className="text-sm md:text-lg italic mb-1">Waiting...</div>
+                            <div className="w-10 h-0.5 bg-white/5 rounded-full" />
                         </div>
                     )}
                 </div>
 
                 {/* Right Opponent */}
-                <div className="z-20 flex flex-col items-center flex-none w-[15%]">
+                <div className="z-20 flex flex-col items-center flex-none w-[18%]">
                     {(() => {
                         const p = getPlayerAtPosition(3);
                         const isCurrent = gameState.currentPlayerIndex === p.originalIndex;
                         return (
                             <div className={`flex flex-col items-center transition-all ${isCurrent ? 'scale-105 md:scale-110' : 'opacity-80 scale-90'}`}>
                                 <div className="relative mb-1">
-                                    <div className={`w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center text-sm md:text-lg ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/50'}`}>
+                                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg md:text-2xl ${isCurrent ? 'bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.5)]' : 'bg-black/50'}`}>
                                         👤
                                     </div>
-                                    <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-5 h-5 md:w-6 md:h-6 rounded-full border border-white flex items-center justify-center font-black text-[10px]">
+                                    <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white w-6 h-6 md:w-7 md:h-7 rounded-full border-2 border-white flex items-center justify-center font-black text-[10px] md:text-xs">
                                         {p.hand.length}
                                     </div>
                                 </div>
-                                <div className="text-white font-bold text-[8px] md:text-xs text-center leading-none mb-1 break-words max-w-[60px] md:max-w-none">{p.name}</div>
-                                <div className="text-yellow-400 text-[8px] md:text-[10px] font-bold leading-none mt-0.5">💰 {p.score.toLocaleString()}</div>
+                                <div className="text-white font-bold text-[10px] md:text-xs text-center leading-none mb-1 break-words max-w-[80px] md:max-w-none">{p.name}</div>
+                                <div className="text-yellow-400 text-[10px] md:text-[10px] font-bold leading-none mt-0.5">💰 {p.score.toLocaleString()}</div>
                                 <div className="flex -space-x-12 md:-space-x-11 mt-1 transform scale-[0.3] md:scale-50 origin-top">
                                     {Array(Math.min(p.hand.length, 13)).fill(0).map((_, i) => (
                                         <div key={i} className="w-8 h-12 md:w-10 md:h-14 bg-blue-800 border border-white/20 rounded-md shadow-md" />
@@ -263,37 +263,37 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                 </div>
             )}
 
-            {/* Bottom Area (Optimized for Portrait/Landscape) */}
-            <div className="w-full bg-black/50 backdrop-blur-3xl border-t border-white/20 py-2 md:py-6 px-2 md:px-4 z-40 flex-none h-[40vh] md:h-[35vh] flex flex-col">
-                <div className="w-full max-w-5xl mx-auto h-full flex flex-col justify-between py-2">
+            {/* Bottom Area (Fixed 30% to prevent cut-off) */}
+            <div className="w-full bg-black/60 backdrop-blur-3xl border-t border-white/20 py-1 md:py-2 px-2 md:px-4 z-40 flex-none h-[30vh] flex flex-col items-center">
+                <div className="w-full max-w-5xl h-full flex flex-col items-center justify-between pb-2">
 
                     {/* Organize Bar */}
-                    <div className="flex flex-wrap justify-center gap-1 md:gap-3 mb-1">
-                        <div className="flex bg-black/40 p-1 rounded-xl border border-white/10">
-                            <button onClick={handleGroupCards} disabled={selectedCards.length === 0} className="px-3 md:px-6 py-2 bg-purple-600 text-white rounded-lg text-xs md:text-sm font-black active:scale-95 disabled:opacity-30">🧩 組合</button>
-                            <button onClick={handleSmartSort} className="px-3 md:px-6 py-2 bg-green-700 text-white rounded-lg text-xs md:text-sm font-black ml-2">🪄 智能</button>
+                    <div className="flex flex-wrap justify-center gap-1 md:gap-2 mt-1">
+                        <div className="flex bg-black/40 p-0.5 rounded-xl border border-white/10">
+                            <button onClick={handleGroupCards} disabled={selectedCards.length === 0} className="px-3 md:px-5 py-1.5 bg-purple-600 text-white rounded-lg text-[10px] md:text-xs font-black active:scale-95 disabled:opacity-20">組合</button>
+                            <button onClick={handleSmartSort} className="px-3 md:px-5 py-1.5 bg-green-700 text-white rounded-lg text-[10px] md:text-xs font-black ml-1">智能</button>
                         </div>
-                        <div className="flex bg-white/5 p-1 rounded-xl border border-white/10 overflow-x-auto scrollbar-hide max-w-[60vw]">
+                        <div className="flex bg-white/5 p-0.5 rounded-xl border border-white/10 overflow-x-auto scrollbar-hide max-w-[65vw]">
                             {[
-                                { type: HandType.Pair, label: '👥 對子', key: 'Pair', color: 'bg-orange-600' },
-                                { type: HandType.Straight, label: '📏 順子', key: 'Straight', color: 'bg-green-600' },
-                                { type: HandType.FullHouse, label: '🏠 葫蘆', key: 'FullHouse', color: 'bg-blue-600' },
-                                { type: HandType.FourOfAKind, label: '💣 鐵支', key: 'FourOfAKind', color: 'bg-red-600' }
+                                { type: HandType.Pair, label: '對子', key: 'Pair', color: 'bg-orange-600' },
+                                { type: HandType.Straight, label: '順子', key: 'Straight', color: 'bg-green-600' },
+                                { type: HandType.FullHouse, label: '葫蘆', key: 'FullHouse', color: 'bg-blue-600' },
+                                { type: HandType.FourOfAKind, label: '鐵支', key: 'FourOfAKind', color: 'bg-red-600' }
                             ].map((item) => (
-                                <button key={item.key} onClick={() => handleAutoPlayCombo(item.type)} disabled={!(availableCombos as any)[item.key]} className={`px-2 md:px-4 py-2 rounded-lg font-bold text-[10px] md:text-xs ml-1 first:ml-0 whitespace-nowrap ${(availableCombos as any)[item.key] ? `${item.color} text-white animate-pulse` : 'bg-black/20 text-white/10'}`}>{item.label}</button>
+                                <button key={item.key} onClick={() => handleAutoPlayCombo(item.type)} disabled={!(availableCombos as any)[item.key]} className={`px-2 md:px-3 py-1.5 rounded-lg font-bold text-[9px] md:text-[10px] ml-1 first:ml-0 whitespace-nowrap ${(availableCombos as any)[item.key] ? `${item.color} text-white animate-pulse` : 'bg-black/20 text-white/5'}`}>{item.label}</button>
                             ))}
                         </div>
                     </div>
 
                     {/* Action Area */}
-                    <div className="flex justify-center space-x-4 md:space-x-12 my-2">
-                        <button onClick={() => handlePlay()} disabled={!isMyTurn || selectedCards.length === 0} className="px-10 md:px-20 py-2 md:py-4 bg-white text-black font-black rounded-2xl shadow-2xl active:scale-95 disabled:opacity-20 text-sm md:text-xl">出牌</button>
-                        <button onClick={handlePass} disabled={!isMyTurn || gameState.tableHand === null} className="px-10 md:px-20 py-2 md:py-4 bg-red-600 text-white font-black rounded-2xl shadow-2xl active:scale-95 disabled:opacity-20 text-sm md:text-xl">PASS</button>
+                    <div className="flex space-x-4 md:space-x-10 my-1">
+                        <button onClick={() => handlePlay()} disabled={!isMyTurn || selectedCards.length === 0} className="px-10 md:px-16 py-2 md:py-3 bg-white text-black font-black rounded-xl shadow-xl active:scale-95 disabled:opacity-10 text-xs md:text-lg transition-all">出牌</button>
+                        <button onClick={handlePass} disabled={!isMyTurn || gameState.tableHand === null} className="px-10 md:px-16 py-2 md:py-3 bg-red-600 text-white font-black rounded-xl shadow-xl active:scale-95 disabled:opacity-10 text-xs md:text-lg transition-all">PASS</button>
                     </div>
 
-                    {/* Hand Display (Centered & Scaled) */}
-                    <div className="w-full flex justify-center pb-4 md:pb-6">
-                        <div className="flex -space-x-10 md:-space-x-6 transform scale-[0.75] sm:scale-85 md:scale-100 origin-bottom">
+                    {/* Player Hand Area */}
+                    <div className="w-full flex justify-center pb-2">
+                        <div className="flex -space-x-12 md:-space-x-8 transform scale-[0.7] sm:scale-85 md:scale-95 origin-bottom">
                             {localHand.map((card) => (
                                 <Card key={`${card.rank}-${card.suit}`} card={card} selected={selectedCards.some(c => c.rank === card.rank && c.suit === card.suit)} onClick={() => toggleCardSelection(card)} />
                             ))}
