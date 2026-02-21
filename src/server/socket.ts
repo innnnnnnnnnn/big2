@@ -314,4 +314,7 @@ io.on("connection", (socket) => {
     });
 });
 
-httpServer.listen(3002);
+const PORT = process.env.PORT || 3002;
+httpServer.listen(PORT, () => {
+    console.log(`[Server] Game server is running on port ${PORT}`);
+});
