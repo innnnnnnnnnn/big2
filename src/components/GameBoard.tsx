@@ -5,6 +5,7 @@ import { GameState, Card as CardType, HandType } from '../logic/types';
 import Card from './Card';
 import { Socket } from 'socket.io-client';
 import { autoOrganizeHand, sortCards, findValidPairs, findValidFiveCardHands } from '../logic/bigTwo';
+import { useAudio } from '../hooks/useAudio';
 
 interface GameBoardProps {
     initialGameState: GameState;
@@ -20,6 +21,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
     const [gameState, setGameState] = useState<GameState>(initialGameState);
     const [selectedCards, setSelectedCards] = useState<CardType[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const { playSound } = useAudio();
 
     // Manage local display order
     const [localHand, setLocalHand] = useState<CardType[]>(initialGameState.players[playerIndex].hand);
@@ -42,6 +44,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                 );
                 return [...stillHeld, ...newCards];
             });
+
+            // Play win sound if game just finished
+            if (state.isFinished && !gameState.isFinished) {
+                playSound('win');
+            }
         });
 
         socket.on("game_start", (data: { state: GameState, playerIndex: number }) => {
@@ -49,10 +56,12 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
             setLocalHand(data.state.players[data.playerIndex].hand);
             setSelectedCards([]);
             setError(null);
+            playSound('deal');
         });
 
         socket.on("error", (msg: string) => {
             setError(msg);
+            playSound('error');
         });
 
         return () => {
@@ -65,6 +74,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
     const isMyTurn = gameState.currentPlayerIndex === playerIndex;
 
     const toggleCardSelection = (card: CardType) => {
+        playSound('slide');
         const isSelected = selectedCards.some(c => c.rank === card.rank && c.suit === card.suit);
         if (isSelected) {
             setSelectedCards(selectedCards.filter(c => !(c.rank === card.rank && c.suit === card.suit)));
@@ -74,11 +84,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
     };
 
     const handlePlay = (cardsToPlay: CardType[] = selectedCards) => {
+        playSound('play');
         socket.emit("play_hand", { roomId, cards: cardsToPlay });
         setSelectedCards([]);
     };
 
     const handlePass = () => {
+        playSound('pass');
         socket.emit("play_hand", { roomId, cards: null });
         setSelectedCards([]);
     };
