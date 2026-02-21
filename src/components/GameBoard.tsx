@@ -144,7 +144,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
     }, []);
 
     return (
-        <div className="fixed inset-0 w-full h-screen bg-[#071c10] flex flex-col items-center overflow-hidden touch-none select-none">
+        <div className="fixed inset-0 w-full h-[100dvh] bg-[#071c10] flex flex-col items-center overflow-hidden touch-none select-none">
             {/* Premium Immersive Background */}
             <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-900/30 via-[#0a2313] to-[#040e08]" />
 
@@ -219,8 +219,8 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
             </div>
 
             {/* Bottom Area: Controls & Hand (50vh) */}
-            <div className="flex-1 w-full flex flex-col items-center justify-end pb-4 md:pb-6 z-40 bg-gradient-to-t from-black via-[#041208]/90 to-transparent overflow-visible">
-                <div className="w-full max-w-6xl flex flex-col items-center justify-end h-full">
+            <div className="flex-1 w-full flex flex-col items-center justify-end pb-[max(1.5rem,env(safe-area-inset-bottom))] md:pb-[max(2.5rem,env(safe-area-inset-bottom))] z-40 bg-gradient-to-t from-black via-[#041208]/90 to-transparent overflow-visible">
+                <div className="w-full max-w-6xl flex flex-col items-center justify-end">
 
                     {/* All Controls (Tools & Actions) */}
                     <div className="w-full flex flex-col items-center gap-2 px-2 mb-2 md:mb-4">
@@ -252,7 +252,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
                         <div className="flex justify-center w-full px-4 overflow-visible relative">
                             {/* Glowing aura behind hand */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-20 bg-emerald-500/10 blur-[50px] pointer-events-none rounded-full z-0" />
-                            <div className="flex -space-x-[3.5rem] sm:-space-x-12 md:-space-x-10 transform scale-[0.75] sm:scale-100 md:scale-110 lg:scale-[1.4] origin-bottom transition-transform duration-300 relative z-10 hover:z-50">
+                            <div className="flex -space-x-[3.25rem] sm:-space-x-12 md:-space-x-[3.25rem] lg:-space-x-10 transform scale-[0.85] sm:scale-100 md:scale-110 lg:scale-[1.3] origin-bottom transition-transform duration-300 relative z-10 hover:z-50">
                                 {localHand.map((card) => (
                                     <Card key={`${card.rank}-${card.suit}`} card={card} selected={selectedCards.some(c => c.rank === card.rank && c.suit === card.suit)} onClick={() => toggleCardSelection(card)} />
                                 ))}

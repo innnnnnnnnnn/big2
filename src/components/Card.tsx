@@ -42,7 +42,7 @@ const Card: React.FC<CardProps> = ({ card, selected, onClick, className = '', di
         <div
             onClick={!disabled ? onClick : undefined}
             className={`
-                relative w-20 h-28 md:w-24 md:h-[136px]
+                relative w-20 h-28 md:w-24 md:h-[136px] shrink-0
                 rounded-xl border-[1px] bg-gradient-to-br from-white to-slate-200
                 flex flex-col p-1.5 md:p-2 cursor-pointer transition-all duration-300 ease-out transform-gpu
                 ${selected
@@ -66,9 +66,9 @@ const Card: React.FC<CardProps> = ({ card, selected, onClick, className = '', di
             </div>
 
             {/* Bottom-right rank & suit (upside down) */}
-            <div className={`text-base md:text-xl font-black ${colorClass} self-end rotate-180 flex flex-col items-end leading-none tracking-tighter absolute bottom-1.5 md:bottom-2 right-1.5 md:right-2`}>
-                <span className="text-lg md:text-2xl">{suitSymbols[card.suit]}</span>
-                <span className="-mt-0.5 md:-mt-1">{rankLabels[card.rank]}</span>
+            <div className={`absolute bottom-1.5 md:bottom-2 right-1.5 md:right-2 text-base md:text-xl font-black ${colorClass} flex flex-col items-center leading-none tracking-tighter rotate-180 origin-center`}>
+                <span>{rankLabels[card.rank]}</span>
+                <span className="text-lg md:text-2xl -mt-0.5 md:-mt-1">{suitSymbols[card.suit]}</span>
             </div>
         </div>
     );
