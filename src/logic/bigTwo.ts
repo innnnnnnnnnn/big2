@@ -115,8 +115,9 @@ export function getHand(cards: Card[]): Hand | null {
 
         const getStraightSuit = () => {
             const str = getStraightStrength(ranks);
-            if (str === 100 || str === 0) return sorted.find(c => c.rank === Rank.Two)!.suit; // 23456 and A2345 use 2
-            return sorted[sorted.length - 1].suit; // normal
+            if (str === 100) return sorted.find(c => c.rank === Rank.Two)!.suit; // 23456 uses 2's suit
+            if (str === 0) return sorted.find(c => c.rank === Rank.Five)!.suit; // A2345 uses 5's suit
+            return sorted[sorted.length - 1].suit; // normal uses highest card's suit
         };
 
         // Straight Flush
