@@ -219,37 +219,40 @@ const GameBoard: React.FC<GameBoardProps> = ({ initialGameState, playerIndex, so
             </div>
 
             {/* Bottom Area: Controls & Hand (50vh) */}
-            <div className="flex-1 w-full flex flex-col items-center justify-between pb-8 md:pb-12 pt-4 z-40 bg-gradient-to-t from-black via-[#041208]/80 to-transparent">
-                <div className="w-full max-w-6xl h-full flex flex-col items-center justify-between">
+            <div className="flex-1 w-full flex flex-col items-center justify-end pb-4 md:pb-6 z-40 bg-gradient-to-t from-black via-[#041208]/90 to-transparent overflow-visible">
+                <div className="w-full max-w-6xl flex flex-col items-center justify-end h-full">
 
-                    {/* Organize Tools */}
-                    <div className="w-full flex flex-wrap justify-center gap-2 px-2">
-                        <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                            <button onClick={handleGroupCards} disabled={selectedCards.length === 0} className="px-5 py-2 bg-gradient-to-b from-indigo-500 to-indigo-700 text-white rounded-xl text-xs font-black active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.5)] border border-indigo-400/50 transition-all">組合</button>
-                            <button onClick={handleSmartSort} className="px-5 py-2 bg-gradient-to-b from-emerald-600 to-emerald-800 text-white rounded-xl text-xs font-black ml-2 active:scale-95 shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.5)] border border-emerald-500/50 transition-all">智能</button>
+                    {/* All Controls (Tools & Actions) */}
+                    <div className="w-full flex flex-col items-center gap-2 px-2 mb-2 md:mb-4">
+                        {/* Row 1: Organize Tools */}
+                        <div className="w-full flex flex-wrap justify-center gap-2 px-2">
+                            <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                                <button onClick={handleGroupCards} disabled={selectedCards.length === 0} className="px-5 py-2.5 bg-gradient-to-b from-indigo-500 to-indigo-700 text-white rounded-xl text-xs md:text-sm font-black active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.5)] border border-indigo-400/50 transition-all">組合</button>
+                                <button onClick={handleSmartSort} className="px-5 py-2.5 bg-gradient-to-b from-emerald-600 to-emerald-800 text-white rounded-xl text-xs md:text-sm font-black ml-2 active:scale-95 shadow-[inset_0_2px_5px_rgba(255,255,255,0.2),0_2px_5px_rgba(0,0,0,0.5)] border border-emerald-500/50 transition-all">智能</button>
+                            </div>
+                            <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 items-center shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-hide max-w-[80vw]">
+                                {Object.entries(availableCombos).map(([key, avail]) => (
+                                    <button key={key} onClick={() => handleAutoPlayCombo(HandType[key as keyof typeof HandType])} disabled={!avail} className={`px-4 py-2.5 rounded-xl font-bold text-[10px] md:text-xs ml-1 first:ml-0 whitespace-nowrap transition-all ${avail ? 'bg-gradient-to-b from-white/30 to-white/10 border border-white/30 text-white shadow-[0_0_15px_rgba(255,255,255,0.2),inset_0_2px_5px_rgba(255,255,255,0.3)] animate-pulse' : 'bg-transparent text-white/20'}`}>
+                                        {key === 'Pair' ? '對子' : key === 'Straight' ? '順子' : key === 'FullHouse' ? '葫蘆' : '鐵支'}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                        <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 items-center shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-x-auto scrollbar-hide max-w-[80vw]">
-                            {Object.entries(availableCombos).map(([key, avail]) => (
-                                <button key={key} onClick={() => handleAutoPlayCombo(HandType[key as keyof typeof HandType])} disabled={!avail} className={`px-4 py-2 rounded-xl font-bold text-[10px] md:text-sm ml-1 first:ml-0 whitespace-nowrap transition-all ${avail ? 'bg-gradient-to-b from-white/30 to-white/10 border border-white/30 text-white shadow-[0_0_15px_rgba(255,255,255,0.2),inset_0_2px_5px_rgba(255,255,255,0.3)] animate-pulse' : 'bg-transparent text-white/20'}`}>
-                                    {key === 'Pair' ? '對子' : key === 'Straight' ? '順子' : key === 'FullHouse' ? '葫蘆' : '鐵支'}
-                                </button>
-                            ))}
+
+                        {/* Row 2: Action Buttons (Same size as organize tools) */}
+                        <div className="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] mt-1">
+                            <button onClick={() => handlePlay()} disabled={!isMyTurn || selectedCards.length === 0} className="px-12 md:px-16 py-2.5 bg-gradient-to-b from-yellow-400 to-yellow-600 text-yellow-950 font-black rounded-xl active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_10px_rgba(255,255,255,0.6),0_2px_5px_rgba(0,0,0,0.5)] border border-yellow-300 transition-all text-sm md:text-base">出 牌</button>
+                            <button onClick={handlePass} disabled={!isMyTurn || gameState.tableHand === null} className="px-12 md:px-16 py-2.5 bg-gradient-to-b from-red-600 to-red-800 text-white font-black rounded-xl ml-2 active:scale-95 disabled:opacity-30 shadow-[inset_0_2px_10px_rgba(255,255,255,0.3),0_2px_5px_rgba(0,0,0,0.5)] border border-red-500 transition-all text-sm md:text-base">PASS</button>
                         </div>
                     </div>
 
-                    {/* Main Actions */}
-                    <div className="flex justify-center space-x-4 md:space-x-8 px-2 w-full max-w-full">
-                        <button onClick={() => handlePlay()} disabled={!isMyTurn || selectedCards.length === 0} className="flex-1 max-w-[240px] py-3 md:py-4 bg-gradient-to-b from-yellow-300 to-yellow-600 text-yellow-950 font-black rounded-2xl shadow-[0_0_20px_rgba(234,179,8,0.4),0_6px_0_rgb(161,98,7),inset_0_2px_10px_rgba(255,255,255,0.6)] active:translate-y-1.5 active:shadow-[0_0_10px_rgba(234,179,8,0.4),0_0_0_rgb(161,98,7),inset_0_2px_10px_rgba(255,255,255,0.2)] transition-all disabled:opacity-30 disabled:grayscale text-lg md:text-3xl border-[1px] border-yellow-200">出 牌</button>
-                        <button onClick={handlePass} disabled={!isMyTurn || gameState.tableHand === null} className="flex-1 max-w-[240px] py-3 md:py-4 bg-gradient-to-b from-red-500 to-red-800 text-white font-black rounded-2xl shadow-[0_0_20px_rgba(220,38,38,0.4),0_6px_0_rgb(153,27,27),inset_0_2px_10px_rgba(255,255,255,0.3)] active:translate-y-1.5 active:shadow-[0_0_10px_rgba(220,38,38,0.4),0_0_0_rgb(153,27,27),inset_0_2px_10px_rgba(255,255,255,0.1)] transition-all disabled:opacity-30 disabled:grayscale text-lg md:text-3xl border-[1px] border-red-400">PASS</button>
-                    </div>
-
-                    {/* Hand Display (Centered & Scaled) */}
+                    {/* Hand Display (Maximized Scale) */}
                     <div className="w-full flex flex-col items-center">
-                        <div className="text-emerald-500/50 text-[10px] md:text-xs font-black uppercase tracking-[0.4em] mb-4 drop-shadow-[0_0_5px_rgba(52,211,153,0.3)] mt-2">Player Hand</div>
-                        <div className="flex justify-center w-full px-10 overflow-visible relative">
+                        <div className="text-emerald-500/50 text-[10px] md:text-xs font-black uppercase tracking-[0.4em] mb-2 drop-shadow-[0_0_5px_rgba(52,211,153,0.3)]">Player Hand</div>
+                        <div className="flex justify-center w-full px-4 overflow-visible relative">
                             {/* Glowing aura behind hand */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-20 bg-emerald-500/10 blur-[50px] pointer-events-none rounded-full" />
-                            <div className="flex -space-x-14 md:-space-x-10 transform scale-[0.6] sm:scale-80 md:scale-110 lg:scale-[1.3] origin-bottom transition-transform duration-300 relative z-10">
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-20 bg-emerald-500/10 blur-[50px] pointer-events-none rounded-full z-0" />
+                            <div className="flex -space-x-[3.5rem] sm:-space-x-12 md:-space-x-10 transform scale-[0.75] sm:scale-100 md:scale-110 lg:scale-[1.4] origin-bottom transition-transform duration-300 relative z-10 hover:z-50">
                                 {localHand.map((card) => (
                                     <Card key={`${card.rank}-${card.suit}`} card={card} selected={selectedCards.some(c => c.rank === card.rank && c.suit === card.suit)} onClick={() => toggleCardSelection(card)} />
                                 ))}
