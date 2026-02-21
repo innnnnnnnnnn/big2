@@ -42,12 +42,6 @@ function getStraightStrength(ranks: Rank[]): number {
     // Check for A, 2, 3, 4, 5 (Smallest)
     if (sStr === JSON.stringify([Rank.Three, Rank.Four, Rank.Five, Rank.Ace, Rank.Two])) return 0;
 
-    // Check for QK123 (Q, K, A, 2, 3)
-    if (sStr === JSON.stringify([3, 12, 13, 14, 15])) return 3;
-
-    // Check for K1234 (K, A, 2, 3, 4)
-    if (sStr === JSON.stringify([3, 4, 13, 14, 15])) return 4;
-
     // For others, use the highest rank in the sequence.
     // e.g., J, Q, K, A, 2 -> 2 (15)
     return sorted[sorted.length - 1];
@@ -97,16 +91,21 @@ export function getHand(cards: Card[]): Hand | null {
 
         const isStraight = (r: Rank[]) => {
             const s = [...r].sort((a, b) => a - b);
-            // Check normal sequence (Handles JQKA2 natively since 11,12,13,14,15 are consecutive)
+            const sStr = JSON.stringify(s);
+
+            // JQKA2, QKA23, KA234 are explicitly forbidden in traditional rules!
+            if (sStr === JSON.stringify([11, 12, 13, 14, 15])) return false; // JQKA2
+            if (sStr === JSON.stringify([3, 12, 13, 14, 15])) return false; // QKA23
+            if (sStr === JSON.stringify([3, 4, 13, 14, 15])) return false; // KA234
+
+            // Check A, 2, 3, 4, 5
+            if (sStr === JSON.stringify([3, 4, 5, 14, 15])) return true; // A2345
+            // Check 2, 3, 4, 5, 6
+            if (sStr === JSON.stringify([3, 4, 5, 6, 15])) return true; // 23456
+
+            // Check normal sequence
             const isNormal = s.every((val, i) => i === 0 || val === s[i - 1] + 1);
             if (isNormal) return true;
-
-            const sStr = JSON.stringify(s);
-            // Check wrapped straights
-            if (sStr === JSON.stringify([3, 4, 5, 14, 15])) return true; // A2345
-            if (sStr === JSON.stringify([3, 4, 5, 6, 15])) return true; // 23456
-            if (sStr === JSON.stringify([3, 12, 13, 14, 15])) return true; // QKA23
-            if (sStr === JSON.stringify([3, 4, 13, 14, 15])) return true; // KA234
 
             return false;
         };
@@ -117,9 +116,7 @@ export function getHand(cards: Card[]): Hand | null {
         const getStraightSuit = () => {
             const str = getStraightStrength(ranks);
             if (str === 100 || str === 0) return sorted.find(c => c.rank === Rank.Two)!.suit; // 23456 and A2345 use 2
-            if (str === 3 && JSON.stringify([...ranks].sort((a, b) => a - b)) === JSON.stringify([3, 12, 13, 14, 15])) return sorted.find(c => c.rank === Rank.Three)!.suit; // QKA23 use 3
-            if (str === 4 && JSON.stringify([...ranks].sort((a, b) => a - b)) === JSON.stringify([3, 4, 13, 14, 15])) return sorted.find(c => c.rank === Rank.Four)!.suit; // KA234 use 4
-            return sorted[sorted.length - 1].suit; // normal (including JQKA2 using 2)
+            return sorted[sorted.length - 1].suit; // normal
         };
 
         // Straight Flush
@@ -309,16 +306,17 @@ export function findValidFiveCardHands(hand: Card[], table: Hand | null, type: H
         // Normal straights
         for (let i = 0; i <= uniqueRanks.length - 5; i++) {
             const slice = uniqueRanks.slice(i, i + 5);
-            if (slice[4] - slice[0] === 4) possibleStraights.push(slice);
+            if (slice[4] - slice[0] === 4) {
+                // EXCLUDE JQKA2 from being a valid straight
+                if (JSON.stringify(slice) !== JSON.stringify([11, 12, 13, 14, 15])) {
+                    possibleStraights.push(slice);
+                }
+            }
         }
         // A2345 (3,4,5,14,15)
         if ([3, 4, 5, 14, 15].every(r => byRank[r])) possibleStraights.push([3, 4, 5, 14, 15]);
         // 23456 (3,4,5,6,15)
         if ([3, 4, 5, 6, 15].every(r => byRank[r])) possibleStraights.push([3, 4, 5, 6, 15]);
-        // QKA23 (3,12,13,14,15)
-        if ([3, 12, 13, 14, 15].every(r => byRank[r])) possibleStraights.push([3, 12, 13, 14, 15]);
-        // KA234 (3,4,13,14,15)
-        if ([3, 4, 13, 14, 15].every(r => byRank[r])) possibleStraights.push([3, 4, 13, 14, 15]);
 
         for (const sr of possibleStraights) {
             // Optimization: Just take one card of each rank for now
