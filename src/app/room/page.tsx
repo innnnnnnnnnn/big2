@@ -19,6 +19,7 @@ const RoomContent = () => {
     const [gameState, setGameState] = useState<GameState | null>(null);
     const [playerIndex, setPlayerIndex] = useState<number>(-1);
     const [difficulty, setDifficulty] = useState<'Easy' | 'Medium' | 'Hard' | 'Expert' | 'Master'>('Medium');
+    const [connectionError, setConnectionError] = useState<string | null>(null);
 
     const myId = (session?.user as any)?.id;
     const myName = (session?.user?.name || "").trim();
@@ -42,6 +43,16 @@ const RoomContent = () => {
         if (!socket || !socket.connected) {
             socket = io(wsUrl);
         }
+
+        socket.on("connect", () => {
+            setConnectionError(null);
+            console.log("[Room] Socket Connected!");
+        });
+
+        socket.on("connect_error", (err) => {
+            console.error("[Room] Socket Connection Error:", err.message);
+            setConnectionError(`無法連線至伺服器: ${wsUrl}`);
+        });
 
         socket.emit("join_room", {
             roomId,
@@ -126,6 +137,14 @@ const RoomContent = () => {
                         📋 複製邀請連結
                     </button>
                 </div>
+
+                {connectionError && (
+                    <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 text-sm font-bold animate-pulse">
+                        ⚠️ {connectionError}
+                        <br />
+                        <span className="text-xs font-normal opacity-70">請確認伺服器網址設定正確，且與網頁協定 (HTTP/HTTPS) 相符。</span>
+                    </div>
+                )}
 
                 <div className="space-y-4 mb-10">
                     {[0, 1, 2, 3].map((i) => {
