@@ -123,56 +123,53 @@ const RoomContent = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#0a4d2e] flex flex-col items-center py-6 px-4 md:p-8 overflow-y-auto">
-            <div className="w-full max-w-2xl bg-black/30 rounded-3xl p-6 md:p-10 border border-white/10 shadow-2xl backdrop-blur-xl">
-                <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+        <div className="h-screen bg-[#0a4d2e] flex flex-col items-center justify-center py-4 px-4 md:p-8 overflow-hidden">
+            <div className="w-full max-w-2xl bg-black/30 rounded-3xl p-6 md:p-10 border border-white/10 shadow-2xl backdrop-blur-xl flex flex-col max-h-full">
+                <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-4 flex-none">
                     <div>
-                        <h1 className="text-2xl md:text-4xl font-black text-white mb-2">房號: {roomId}</h1>
-                        <p className="text-yellow-500 font-bold">等待玩家加入中... ({players.length}/4)</p>
+                        <h1 className="text-xl md:text-3xl font-black text-white mb-1">房號: {roomId}</h1>
+                        <p className="text-yellow-500 text-sm font-bold">等待玩家加入中... ({players.length}/4)</p>
                     </div>
                     <button
                         onClick={copyLink}
-                        className="w-full md:w-auto px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-bold border border-white/10 transition-all"
+                        className="w-full md:w-auto px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-xs font-bold border border-white/10 transition-all"
                     >
                         📋 複製邀請連結
                     </button>
                 </div>
 
                 {connectionError && (
-                    <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 text-sm font-bold animate-pulse">
+                    <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 text-xs font-bold animate-pulse flex-none">
                         ⚠️ {connectionError}
-                        <br />
-                        <span className="text-xs font-normal opacity-70 italic">請檢查連線設定</span>
                     </div>
                 )}
 
-                <div className="space-y-4 mb-10">
+                <div className="space-y-2 md:space-y-4 mb-6 overflow-y-auto flex-1 pr-2 scrollbar-hide">
                     {[0, 1, 2, 3].map((i) => {
                         const p = players[i];
                         return (
-                            <div key={i} className={`flex items-center justify-between p-4 rounded-2xl border ${p ? 'bg-black/40 border-white/20' : 'bg-black/10 border-white/5 border-dashed'}`}>
-                                <div className="flex items-center space-x-4">
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl ${p ? 'bg-yellow-500' : 'bg-white/5'}`}>
+                            <div key={i} className={`flex items-center justify-between p-3 md:p-4 rounded-2xl border ${p ? 'bg-black/40 border-white/20' : 'bg-black/10 border-white/5 border-dashed'}`}>
+                                <div className="flex items-center space-x-3 md:space-x-4">
+                                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-lg ${p ? 'bg-yellow-500' : 'bg-white/5'}`}>
                                         {p ? '👤' : ''}
                                     </div>
                                     <div>
-                                        <div className={`font-bold ${p ? 'text-white' : 'text-white/20'}`}>
+                                        <div className={`font-bold text-sm md:text-base ${p ? 'text-white' : 'text-white/20'}`}>
                                             {p ? p.name : '等待加入...'}
                                         </div>
-                                        {p?.isHost && <span className="text-[10px] bg-yellow-600 text-white px-2 py-0.5 rounded-full uppercase font-black">房主</span>}
+                                        {p?.isHost && <span className="text-[8px] md:text-[10px] bg-yellow-600 text-white px-2 py-0.5 rounded-full uppercase font-black">房主</span>}
                                     </div>
                                 </div>
-                                {p && <div className="text-green-500 font-bold">已就緒</div>}
+                                {p && <div className="text-green-500 font-bold text-sm">已就緒</div>}
                             </div>
                         );
                     })}
                 </div>
 
                 {/* AI Difficulty Selector */}
-                <div className="mb-10 bg-black/20 p-6 rounded-2xl border border-white/5">
-                    <h2 className="text-white font-bold mb-4 flex items-center">
-                        🤖 電腦難度設定
-                        {!currentIsHost && <span className="ml-2 text-xs text-white/40 font-normal">(由房主設定)</span>}
+                <div className="mb-6 bg-black/20 p-4 md:p-6 rounded-2xl border border-white/5 flex-none">
+                    <h2 className="text-white text-sm font-bold mb-3 flex items-center">
+                        🤖 電腦難度
                     </h2>
                     <div className="flex flex-wrap gap-2">
                         {difficulties.map((diff) => (
@@ -180,10 +177,10 @@ const RoomContent = () => {
                                 key={diff.id}
                                 disabled={!currentIsHost}
                                 onClick={() => handleDifficultyChange(diff.id as any)}
-                                className={`flex-1 min-w-[80px] py-3 rounded-xl font-black text-sm transition-all border-2 ${difficulty === diff.id
-                                    ? `${diff.color} border-white text-white shadow-[0_0_15px_rgba(255,255,255,0.3)]`
+                                className={`flex-1 min-w-[60px] py-2 rounded-xl font-black text-[10px] md:text-xs transition-all border-2 ${difficulty === diff.id
+                                    ? `${diff.color} border-white text-white shadow-lg`
                                     : 'bg-black/40 border-transparent text-white/40 hover:bg-black/60'
-                                    } ${!currentIsHost && 'cursor-default opacity-80'}`}
+                                    } ${!currentIsHost && 'cursor-default'}`}
                             >
                                 {diff.name}
                             </button>
@@ -194,12 +191,12 @@ const RoomContent = () => {
                 {currentIsHost ? (
                     <button
                         onClick={startGame}
-                        className="w-full py-5 bg-yellow-500 hover:bg-yellow-400 text-black font-black rounded-2xl text-xl shadow-[0_6px_0_rgb(180,100,0)] transition-all active:translate-y-1"
+                        className="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-black rounded-2xl text-lg shadow-[0_5px_0_rgb(180,100,0)] transition-all active:translate-y-1 flex-none"
                     >
-                        開始遊戲 (START GAME)
+                        開始遊戲 (START)
                     </button>
                 ) : (
-                    <div className="text-white/40 text-center font-bold">只有房主可以開始遊戲</div>
+                    <div className="text-white/40 text-center font-bold text-sm flex-none">等待房主開始...</div>
                 )}
 
                 <p className="mt-6 text-center text-white/20 text-sm">
