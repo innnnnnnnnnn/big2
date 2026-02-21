@@ -336,7 +336,7 @@ export function findValidFiveCardHands(hand: Card[], table: Hand | null, type: H
  * Used for the "Smart Sort" feature.
  */
 export function autoOrganizeHand(cards: Card[]): Card[] {
-    let remaining = sortCards(cards);
+    const remaining = sortCards(cards);
     const organized: Card[] = [];
 
     // Helper to extract a set of cards from remaining
@@ -348,43 +348,49 @@ export function autoOrganizeHand(cards: Card[]): Card[] {
         organized.push(...toExtract);
     };
 
-    // 1. Try to find 5-card hands (Simple greedy approach)
-    // We'll check for Full Houses and Straights
-    // Full Houses
-    const counts: Record<number, Card[]> = {};
-    remaining.forEach(c => {
-        if (!counts[c.rank]) counts[c.rank] = [];
-        counts[c.rank].push(c);
-    });
+    while (true) {
+        // Build counts based on current remaining
+        const counts: Record<number, Card[]> = {};
+        remaining.forEach(c => {
+            if (!counts[c.rank]) counts[c.rank] = [];
+            counts[c.rank].push(c);
+        });
 
-    const rankFreqs = Object.keys(counts).map(Number).sort((a, b) => counts[b].length - counts[a].length || b - a);
+        const rankFreqs = Object.keys(counts).map(Number).sort((a, b) => counts[b].length - counts[a].length || b - a);
+        let extractedSomething = false;
 
-    // Check for 4-of-a-kind (Iron Branch)
-    for (const r of rankFreqs) {
-        if (counts[r].length === 4) {
-            // Find a kicker
-            const kickerRank = rankFreqs.find(rk => rk !== r);
-            if (kickerRank) {
-                const quad = [...counts[r]];
-                const kicker = counts[kickerRank][0];
-                extract([...quad, kicker]);
-                // Re-calculate freqs for next pass
-                return autoOrganizeHand([...organized, ...remaining]);
+        // Check for 4-of-a-kind (Iron Branch)
+        for (const r of rankFreqs) {
+            if (counts[r].length === 4) {
+                const kickerRank = rankFreqs.find(rk => rk !== r);
+                if (kickerRank) {
+                    const quad = [...counts[r]];
+                    const kicker = counts[kickerRank][0];
+                    extract([...quad, kicker]);
+                    extractedSomething = true;
+                    break;
+                }
             }
         }
-    }
 
-    // Check for Full House
-    const trips = rankFreqs.filter(r => counts[r].length === 3);
-    const pairs = rankFreqs.filter(r => counts[r].length >= 2);
+        if (extractedSomething) continue;
 
-    if (trips.length > 0) {
-        const tripRank = trips[0];
-        const pairRank = pairs.find(r => r !== tripRank);
-        if (pairRank) {
-            extract([...counts[tripRank], ...counts[pairRank].slice(0, 2)]);
-            return autoOrganizeHand([...organized, ...remaining]);
+        // Check for Full House
+        const trips = rankFreqs.filter(r => counts[r].length >= 3);
+        const pairs = rankFreqs.filter(r => counts[r].length >= 2);
+
+        if (trips.length > 0) {
+            const tripRank = trips[0];
+            const pairRank = pairs.find(r => r !== tripRank);
+            if (pairRank) {
+                // Must ensure we only take exactly 3 and 2
+                extract([...counts[tripRank].slice(0, 3), ...counts[pairRank].slice(0, 2)]);
+                extractedSomething = true;
+                continue;
+            }
         }
+
+        break;
     }
 
     // 2. Find Pairs
@@ -396,6 +402,7 @@ export function autoOrganizeHand(cards: Card[]): Card[] {
 
     const currentPairs = Object.keys(remainingCounts).map(Number).filter(r => remainingCounts[r].length >= 2).sort((a, b) => a - b);
     for (const r of currentPairs) {
+        // If there are 3, it means it's a residual from Full House, just take 2 as a pair
         extract(remainingCounts[r].slice(0, 2));
     }
 
